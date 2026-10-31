@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-10-28",
+  "overall": "PASS_FOR_TESTED_SANDBOX_SCENARIOS",
+  "runtime": "IRIS 2026.3.0AI build 154",
+  "production": "Studio.BloodDemo.Production",
+  "pythonTests": 139,
+  "javascriptTests": "PASS",
+  "authenticatedHttpLifecycle": "PASS",
+  "vectorFixture": "PASS (previous native acceptance; synthetic 3D vectors)",
+  "genericLive": "PASS: ACCEPT/REVIEW, sessions 30/31",
+  "bloodLive": "PASS: B/C/REVIEW, sessions 32/33/34",
+  "bloodPolicy": "PASS: three rejections without provider",
+  "legacyBpl": "PASS: three traced simulation messages",
+  "runtimeCrash": {
+    "signal": 11,
+    "processes": [
+      2064,
+      2206
+    ],
+    "host": "AgentDecision"
+  },
+  "environmentChanges": [
+    "Recovered troubled sandbox; existing message marked suspended by native recovery",
+    "Restarted original BloodDemo Production",
+    "Installed AcceptOperation and ReviewOperation local acknowledgement hosts",
+    "Created test drafts/releases"
+  ],
+  "blockedAction": null,
+  "rootCause": "Regression mitigated by replacing Recorder Python entry with ObjectScript. Internal IRIS SIGSEGV cause not proven.",
+  "unvalidated": [
+    "clean installation",
+    "load/performance",
+    "semantic RAG corpus",
+    "vector tool inside LIVE LLM pipeline",
+    "browser visual QA"
+  ],
+  "previousFailure": {
+    "genericLive": "FAIL: NATIVE_MESSAGE_FAILED",
+    "bloodLive": "FAIL: DECISION_DEADLINE_EXCEEDED",
+    "bloodPolicy": "FAIL: simulation usage assertion",
+    "legacyBpl": "FAIL: NATIVE_TEST_FAILED (previous run)",
+    "runtimeCrash": {
+      "signal": 11,
+      "processes": [
+        2064,
+        2206
+      ],
+      "host": "AgentDecision"
+    }
+  },
+  "portableLive": "PASS: two agents, native session 1257",
+  "nativeRecorder": "PASS: hierarchy, error status, redaction and bounded observations",
+  "correction": "Studio.Trace.Recorder.Start/Finish now use ObjectScript; no Embedded Python initialization by telemetry before SDK invocation."
+}

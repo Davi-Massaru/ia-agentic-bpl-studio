@@ -1,0 +1,334 @@
+{
+  "mode": "SIMULATION",
+  "providerInvoked": false,
+  "runs": [
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "SUCCESS"
+        },
+        {
+          "step": "AcceptOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2DC34CA-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2DC34CA-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "403",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "SUCCESS",
+      "action": "ACCEPT",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:AcceptOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2DC34CA-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "405",
+      "messageId": "407",
+      "interopSessionId": 407,
+      "validated": {
+        "status": "SUCCESS",
+        "action": "ACCEPT",
+        "reason": "[REDACTED]",
+        "evidenceRefs": []
+      },
+      "usage": {
+        "source": "SIMULATION",
+        "providerInvoked": false
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "mode": "SIMULATION",
+        "length": 19
+      },
+      "output": {
+        "status": "SUCCESS",
+        "action": "ACCEPT",
+        "reason": "[REDACTED]",
+        "errorCode": ""
+      },
+      "destination": "AcceptOperation",
+      "errorCode": ""
+    },
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "SUCCESS"
+        },
+        {
+          "step": "ReviewOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2DE91D0-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2DE91D0-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "409",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "SUCCESS",
+      "action": "REVIEW",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2DE91D0-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "411",
+      "messageId": "413",
+      "interopSessionId": 413,
+      "validated": {
+        "status": "SUCCESS",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "evidenceRefs": []
+      },
+      "usage": {
+        "source": "SIMULATION",
+        "providerInvoked": false
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "mode": "SIMULATION",
+        "length": 19
+      },
+      "output": {
+        "status": "SUCCESS",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "errorCode": ""
+      },
+      "destination": "ReviewOperation",
+      "errorCode": ""
+    },
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "INVALID"
+        },
+        {
+          "step": "ReviewOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2E101AE-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2E101AE-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "415",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "INVALID",
+      "action": "REVIEW",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2E101AE-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "417",
+      "messageId": "419",
+      "interopSessionId": 419,
+      "usage": {
+        "source": "SIMULATION",
+        "providerInvoked": false
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "mode": "SIMULATION",
+        "length": 17
+      },
+      "output": {
+        "status": "INVALID",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "errorCode": "AI_OUTPUT_INVALID"
+      },
+      "destination": "ReviewOperation",
+      "errorCode": "AI_OUTPUT_INVALID"
+    },
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "TIMEOUT"
+        },
+        {
+          "step": "ReviewOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2E3B099-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2E3B099-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "421",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "TIMEOUT",
+      "action": "REVIEW",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2E3B099-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "423",
+      "messageId": "425",
+      "interopSessionId": 425,
+      "output": {
+        "status": "TIMEOUT",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "errorCode": "SIMULATION_TIMEOUT"
+      },
+      "destination": "ReviewOperation",
+      "errorCode": "SIMULATION_TIMEOUT"
+    },
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "ERROR"
+        },
+        {
+          "step": "ReviewOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2E61D9A-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2E61D9A-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "427",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "ERROR",
+      "action": "REVIEW",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2E61D9A-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "429",
+      "messageId": "431",
+      "interopSessionId": 431,
+      "output": {
+        "status": "ERROR",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "errorCode": "SIMULATION_PROVIDER_DOWN"
+      },
+      "destination": "ReviewOperation",
+      "errorCode": "SIMULATION_PROVIDER_DOWN"
+    },
+    {
+      "events": [
+        {
+          "step": "StudioWorkflowService",
+          "status": "SUBMITTED"
+        },
+        {
+          "step": "StudioW5b3adf8e8450498cR3",
+          "status": "DENIED"
+        },
+        {
+          "step": "ReviewOperation",
+          "status": "LOCAL_RECEIPT"
+        }
+      ],
+      "toolCalls": [],
+      "source": "native-IRIS-Production",
+      "executionId": "C2E87A3C-D16C-11F1-9B44-0242AC120002",
+      "correlationId": "C2E87A3C-D16C-11F1-9B44-0242AC120002",
+      "releaseId": "7b3107cca97847c3a37764120a52aa15",
+      "mode": "SIMULATION",
+      "bindingId": "5b3adf8e8450498c:decision",
+      "agentRevision": 1,
+      "input": {
+        "eventId": "[REDACTED]",
+        "description": "[REDACTED]"
+      },
+      "requestBodyId": "433",
+      "bplClass": "Studio.Managed.W5b3adf8e8450498cR3",
+      "bplHost": "StudioW5b3adf8e8450498cR3",
+      "status": "DENIED",
+      "action": "REVIEW",
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "agentSessionId": "",
+      "decisionExecutionId": "C2E87A3C-D16C-11F1-9B44-0242AC120002",
+      "responseBodyId": "435",
+      "messageId": "437",
+      "interopSessionId": 437,
+      "output": {
+        "status": "DENIED",
+        "action": "REVIEW",
+        "reason": "[REDACTED]",
+        "errorCode": "SIMULATION_TOOL_DENIED"
+      },
+      "destination": "ReviewOperation",
+      "errorCode": "SIMULATION_TOOL_DENIED"
+    }
+  ],
+  "nativeRuntimeSuiteStatus": 1
+}

@@ -1,0 +1,13 @@
+{
+  "capturedAt": "2026-10-28",
+  "page": "Test & Trace",
+  "source": "authenticated local IRIS UI; historical run inspected without new inference",
+  "executionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+  "agentSessionId": "30",
+  "observations": [
+    "AgentDecision",
+    "AI Hub Chat",
+    "ReadEvent"
+  ],
+  "image": "trace-observations-live.png"
+}

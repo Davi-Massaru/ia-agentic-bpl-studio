@@ -1,0 +1,462 @@
+{
+  "checkedAt": "2026-10-28T13:36:51.103732+00:00",
+  "ok": true,
+  "mode": "LIVE",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "runs": [
+    {
+      "action": "B",
+      "agentRevision": 1,
+      "agentSessionId": "32",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockCenterB",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockCenterB"
+        }
+      ],
+      "executionId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1211,
+      "messageId": "1211",
+      "mode": "LIVE",
+      "observations": [
+        {
+          "durationMs": 2068.762812,
+          "endTime": "2026-10-28 13:36:54Z",
+          "executionId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "id": "A2A5D900-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:36:52Z",
+          "status": "SUCCESS",
+          "traceId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        },
+        {
+          "durationMs": 1913.231443,
+          "endTime": "2026-10-28 13:36:54Z",
+          "executionId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "id": "A2BD405B-D2D4-11F1-B681-0242AC120002",
+          "metadata": {
+            "model": "gpt-4.1-mini",
+            "provider": "openai"
+          },
+          "name": "AI Hub Chat",
+          "parentObservationId": "A2A5D900-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:53Z",
+          "status": "SUCCESS",
+          "traceId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "type": "agent",
+          "usage": {
+            "current_context_tokens": 133,
+            "model_context_size": 1047576,
+            "total_cache_creation_tokens": 0,
+            "total_cache_read_tokens": 0,
+            "total_completion_tokens": 69,
+            "total_interactions": 2,
+            "total_llm_duration_ms": 1911,
+            "total_prompt_tokens": 454,
+            "total_reasoning_tokens": 0,
+            "total_tool_calls": 1,
+            "total_tool_duration_ms": 0
+          }
+        },
+        {
+          "durationMs": 0.408165,
+          "endTime": "2026-10-28 13:36:54Z",
+          "executionId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "id": "A352784D-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "ReadStock",
+          "parentObservationId": "A2BD405B-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:54Z",
+          "status": "SUCCESS",
+          "traceId": "A2A3F816-D2D4-11F1-B681-0242AC120002",
+          "type": "tool",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "B",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 212,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockCenterB",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1150",
+      "responseBodyId": "1153",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "group": "O+",
+          "name": "ReadStock",
+          "result": {
+            "B": {
+              "minutes": 30,
+              "units": 12
+            },
+            "C": {
+              "minutes": 55,
+              "units": 3
+            },
+            "group": "O+",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 133,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 69,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 1911,
+        "total_prompt_tokens": 454,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "B",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "action": "C",
+      "agentRevision": 1,
+      "agentSessionId": "33",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockCenterC",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockCenterC"
+        }
+      ],
+      "executionId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1218,
+      "messageId": "1218",
+      "mode": "LIVE",
+      "observations": [
+        {
+          "durationMs": 4238.525907,
+          "endTime": "2026-10-28 13:36:59Z",
+          "executionId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "id": "A3EEDE6F-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:36:55Z",
+          "status": "SUCCESS",
+          "traceId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        },
+        {
+          "durationMs": 4082.652548,
+          "endTime": "2026-10-28 13:36:59Z",
+          "executionId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "id": "A4065337-D2D4-11F1-B681-0242AC120002",
+          "metadata": {
+            "model": "gpt-4.1-mini",
+            "provider": "openai"
+          },
+          "name": "AI Hub Chat",
+          "parentObservationId": "A3EEDE6F-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:55Z",
+          "status": "SUCCESS",
+          "traceId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "type": "agent",
+          "usage": {
+            "current_context_tokens": 166,
+            "model_context_size": 1047576,
+            "total_cache_creation_tokens": 0,
+            "total_cache_read_tokens": 0,
+            "total_completion_tokens": 108,
+            "total_interactions": 2,
+            "total_llm_duration_ms": 4081,
+            "total_prompt_tokens": 454,
+            "total_reasoning_tokens": 0,
+            "total_tool_calls": 1,
+            "total_tool_duration_ms": 0
+          }
+        },
+        {
+          "durationMs": 0.060485,
+          "endTime": "2026-10-28 13:36:58Z",
+          "executionId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "id": "A5C4F4DB-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "ReadStock",
+          "parentObservationId": "A4065337-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:58Z",
+          "status": "SUCCESS",
+          "traceId": "A3EA3489-D2D4-11F1-B681-0242AC120002",
+          "type": "tool",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "C",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 346,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockCenterC",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1157",
+      "responseBodyId": "1160",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "group": "A+",
+          "name": "ReadStock",
+          "result": {
+            "B": {
+              "minutes": 30,
+              "units": 2
+            },
+            "C": {
+              "minutes": 55,
+              "units": 15
+            },
+            "group": "A+",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 166,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 108,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 4081,
+        "total_prompt_tokens": 454,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "C",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "action": "REVIEW",
+      "agentRevision": 1,
+      "agentSessionId": "34",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockReview",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockReview"
+        }
+      ],
+      "executionId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1225,
+      "messageId": "1225",
+      "mode": "LIVE",
+      "observations": [
+        {
+          "durationMs": 2581.722408,
+          "endTime": "2026-10-28 13:37:01Z",
+          "executionId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "id": "A67E76A4-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:36:59Z",
+          "status": "SUCCESS",
+          "traceId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        },
+        {
+          "durationMs": 2425.560634,
+          "endTime": "2026-10-28 13:37:01Z",
+          "executionId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "id": "A695F70C-D2D4-11F1-B681-0242AC120002",
+          "metadata": {
+            "model": "gpt-4.1-mini",
+            "provider": "openai"
+          },
+          "name": "AI Hub Chat",
+          "parentObservationId": "A67E76A4-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:59Z",
+          "status": "SUCCESS",
+          "traceId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "type": "agent",
+          "usage": {
+            "current_context_tokens": 159,
+            "model_context_size": 1047576,
+            "total_cache_creation_tokens": 0,
+            "total_cache_read_tokens": 0,
+            "total_completion_tokens": 97,
+            "total_interactions": 2,
+            "total_llm_duration_ms": 2423,
+            "total_prompt_tokens": 454,
+            "total_reasoning_tokens": 0,
+            "total_tool_calls": 1,
+            "total_tool_duration_ms": 0
+          }
+        },
+        {
+          "durationMs": 0.086023,
+          "endTime": "2026-10-28 13:37:00Z",
+          "executionId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "id": "A74D3279-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "ReadStock",
+          "parentObservationId": "A695F70C-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:37:00Z",
+          "status": "SUCCESS",
+          "traceId": "A67CF42B-D2D4-11F1-B681-0242AC120002",
+          "type": "tool",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 317,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockReview",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1164",
+      "responseBodyId": "1167",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "group": "O+",
+          "name": "ReadStock",
+          "result": {
+            "B": {
+              "minutes": 30,
+              "units": 12
+            },
+            "C": {
+              "minutes": 55,
+              "units": 3
+            },
+            "group": "O+",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 159,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 97,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 2423,
+        "total_prompt_tokens": 454,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "REVIEW",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    }
+  ],
+  "workflowId": "746402cd209a41ee",
+  "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+  "agentId": "stock-mvp-be361ed5"
+}

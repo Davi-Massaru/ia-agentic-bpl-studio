@@ -1,0 +1,297 @@
+{
+  "checkedAt": "2026-10-28T13:36:32.829976+00:00",
+  "ok": true,
+  "mode": "LIVE",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "runs": [
+    {
+      "action": "ACCEPT",
+      "agentRevision": 1,
+      "agentSessionId": "30",
+      "bindingId": "139481e737174681:decision",
+      "bplClass": "Studio.Managed.W139481e737174681R2",
+      "bplHost": "StudioW139481e737174681R2",
+      "correlationId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+      "destination": "AcceptOperation",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW139481e737174681R2"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "AcceptOperation"
+        }
+      ],
+      "executionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "description": "[REDACTED]",
+        "eventId": "[REDACTED]"
+      },
+      "interopSessionId": 1196,
+      "messageId": "1196",
+      "mode": "LIVE",
+      "observations": [
+        {
+          "durationMs": 3116.784672,
+          "endTime": "2026-10-28 13:36:37Z",
+          "executionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "id": "9780508B-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:36:34Z",
+          "status": "SUCCESS",
+          "traceId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        },
+        {
+          "durationMs": 2862.828022,
+          "endTime": "2026-10-28 13:36:37Z",
+          "executionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "id": "97A6AE34-D2D4-11F1-B681-0242AC120002",
+          "metadata": {
+            "model": "gpt-4.1-mini",
+            "provider": "openai"
+          },
+          "name": "AI Hub Chat",
+          "parentObservationId": "9780508B-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:34Z",
+          "status": "SUCCESS",
+          "traceId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "type": "agent",
+          "usage": {
+            "current_context_tokens": 132,
+            "model_context_size": 1047576,
+            "total_cache_creation_tokens": 0,
+            "total_cache_read_tokens": 0,
+            "total_completion_tokens": 50,
+            "total_interactions": 2,
+            "total_llm_duration_ms": 2856,
+            "total_prompt_tokens": 414,
+            "total_reasoning_tokens": 0,
+            "total_tool_calls": 1,
+            "total_tool_duration_ms": 1
+          }
+        },
+        {
+          "durationMs": 0.900483,
+          "endTime": "2026-10-28 13:36:35Z",
+          "executionId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "id": "9878B7F7-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "ReadEvent",
+          "parentObservationId": "97A6AE34-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:35Z",
+          "status": "SUCCESS",
+          "traceId": "977EDA25-D2D4-11F1-B681-0242AC120002",
+          "type": "tool",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "ACCEPT",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 135,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:AcceptOperation",
+      "releaseId": "c62833f82274477295b02252cbc46fcf",
+      "requestBodyId": "1136",
+      "responseBodyId": "1139",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "name": "ReadEvent",
+          "result": {
+            "eligible": true,
+            "eventId": "E-OK",
+            "evidenceRef": "event:E-OK",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 132,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 50,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 2856,
+        "total_prompt_tokens": 414,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 1
+      },
+      "validated": {
+        "action": "ACCEPT",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "action": "REVIEW",
+      "agentRevision": 1,
+      "agentSessionId": "31",
+      "bindingId": "139481e737174681:decision",
+      "bplClass": "Studio.Managed.W139481e737174681R2",
+      "bplHost": "StudioW139481e737174681R2",
+      "correlationId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+      "destination": "ReviewOperation",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW139481e737174681R2"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "ReviewOperation"
+        }
+      ],
+      "executionId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "description": "[REDACTED]",
+        "eventId": "[REDACTED]"
+      },
+      "interopSessionId": 1203,
+      "messageId": "1203",
+      "mode": "LIVE",
+      "observations": [
+        {
+          "durationMs": 2545.371443,
+          "endTime": "2026-10-28 13:36:39Z",
+          "executionId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "id": "996A24AD-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:36:37Z",
+          "status": "SUCCESS",
+          "traceId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        },
+        {
+          "durationMs": 2390.782379,
+          "endTime": "2026-10-28 13:36:39Z",
+          "executionId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "id": "9981533B-D2D4-11F1-B681-0242AC120002",
+          "metadata": {
+            "model": "gpt-4.1-mini",
+            "provider": "openai"
+          },
+          "name": "AI Hub Chat",
+          "parentObservationId": "996A24AD-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:37Z",
+          "status": "SUCCESS",
+          "traceId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "type": "agent",
+          "usage": {
+            "current_context_tokens": 130,
+            "model_context_size": 1047576,
+            "total_cache_creation_tokens": 0,
+            "total_cache_read_tokens": 0,
+            "total_completion_tokens": 47,
+            "total_interactions": 2,
+            "total_llm_duration_ms": 2388,
+            "total_prompt_tokens": 419,
+            "total_reasoning_tokens": 0,
+            "total_tool_calls": 1,
+            "total_tool_duration_ms": 0
+          }
+        },
+        {
+          "durationMs": 0.061074,
+          "endTime": "2026-10-28 13:36:38Z",
+          "executionId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "id": "9A5C585B-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "ReadEvent",
+          "parentObservationId": "9981533B-D2D4-11F1-B681-0242AC120002",
+          "startTime": "2026-10-28 13:36:38Z",
+          "status": "SUCCESS",
+          "traceId": "9962AE36-D2D4-11F1-B681-0242AC120002",
+          "type": "tool",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 109,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:ReviewOperation",
+      "releaseId": "c62833f82274477295b02252cbc46fcf",
+      "requestBodyId": "1143",
+      "responseBodyId": "1146",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "name": "ReadEvent",
+          "result": {
+            "eligible": false,
+            "eventId": "E-REVIEW",
+            "evidenceRef": "event:E-REVIEW",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 130,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 47,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 2388,
+        "total_prompt_tokens": 419,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "REVIEW",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    }
+  ],
+  "workflowId": "139481e737174681",
+  "releaseId": "c62833f82274477295b02252cbc46fcf"
+}

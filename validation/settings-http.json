@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "transport": "native IRIS WSGI authenticated HTTP",
+  "checks": [
+    {
+      "check": "authenticated-settings",
+      "status": 200
+    },
+    {
+      "check": "csrf-required",
+      "status": 403
+    },
+    {
+      "check": "unsupported-provider-rejected-without-echo",
+      "status": 422
+    },
+    {
+      "check": "templates-route",
+      "status": 200
+    }
+  ],
+  "providerInvoked": false
+}

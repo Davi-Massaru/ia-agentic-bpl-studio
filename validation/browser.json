@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "runtime": "2026.3.0AI.154.0",
+  "authenticatedPrincipal": "studio",
+  "screens": {
+    "explorer": "Native authorized Production catalog and managed workflows loaded",
+    "designer": "Native graph, typed input preview valid with redaction, English inspector",
+    "testTrace": "Browser submitted explicit SIMULATION and displayed SUCCESS/AcceptOperation",
+    "publisher": "Native validation valid, source diff returned, immutable release IDs displayed",
+    "settings": "English dialog open, provider/model/credential blank"
+  },
+  "browserExecutionId": "4C97258F-D196-11F1-B73A-0242AC120002",
+  "nativeMessageId": "824",
+  "providerInvoked": false,
+  "screenshots": [
+    "screens/explorer.jpg",
+    "screens/designer.jpg",
+    "screens/test-trace.jpg",
+    "screens/publisher.jpg",
+    "screens/settings.jpg"
+  ]
+}

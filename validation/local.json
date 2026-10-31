@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-26T01:16:18.917796+00:00",
+  "contestSource": "https://community.intersystems.com/post/intersystems-programming-contest-ai-agents-interoperability-workflows",
+  "localStatus": "FAIL",
+  "contestStatus": "NOT_VALIDATED",
+  "checks": [
+    {
+      "name": "python-tests",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ".......................................................                  [100%]\n55 passed in 1.24s\n"
+    },
+    {
+      "name": "compose-config",
+      "status": "PASS",
+      "exitCode": 0,
+      "output": ""
+    },
+    {
+      "name": "docker-engine",
+      "status": "FAIL",
+      "exitCode": 0,
+      "output": "\nrequest returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.47/info, check if the server supports the requested API version\n"
+    },
+    {
+      "name": "local-build154-image",
+      "status": "FAIL",
+      "exitCode": 1,
+      "output": "\nrequest returned Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.47/images/iris-community:2026.3.0AI.154.0/json, check if the server supports the requested API version\n"
+    }
+  ],
+  "nativeAcceptance": {
+    "status": "NOT_RUN",
+    "required": [
+      "Confirm runtime build 2026.3.0AI.154.0, not just an image tag",
+      "Compile Studio classes in an authorized namespace",
+      "Send messages through a Business Service and native BPL",
+      "Observe native AI Hub agent and authorized READ ToolSet calls",
+      "Trace two different decisions and deterministic failure fallback",
+      "Compile/publish managed workflow and preserve immutable revisions"
+    ]
+  },
+  "submissionAcceptance": {
+    "status": "NOT_VERIFIED",
+    "required": [
+      "Public GitHub/GitLab repository and open-source license",
+      "English installation and working demo description/video",
+      "Open Exchange entry and participant/team information"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-bpl-studio.example/schemas/decision-binding.json",
+  "title": "Studio DecisionBinding — contrato proposto",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bindingId", "agentRef", "inputs", "outputs", "routes", "fallback"],
+  "properties": {
+    "bindingId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "agentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": "integer", "minimum": 1}
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "required"],
+        "properties": {
+          "source": {"type": "string"},
+          "target": {"type": "string"},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "outputs": {"type": "object", "required": ["action"], "properties": {"action": {"type": "string"}}, "additionalProperties": {"type": "string"}},
+    "routes": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string"}},
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "target"],
+      "properties": {"action": {"type": "string"}, "target": {"type": "string"}}
+    },
+    "timeouts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"agentMs": {"type": "integer", "minimum": 1000, "maximum": 300000}}
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "README.md": {
+    "screenshots": 15,
+    "nativeCodeBlocksCheckedAgainstSource": 4,
+    "linksValid": true,
+    "nativeLiveEvidenceVerified": true
+  },
+  "README_PT_BR.md": {
+    "screenshots": 15,
+    "nativeCodeBlocksCheckedAgainstSource": 4,
+    "linksValid": true,
+    "nativeLiveEvidenceVerified": true
+  }
+}

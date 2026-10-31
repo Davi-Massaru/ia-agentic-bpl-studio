@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-bpl-studio.example/schemas/decision-response.json",
+  "title": "Studio DecisionResponse — contrato proposto",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "action", "decisionExecutionId"],
+  "properties": {
+    "schemaVersion": {"const": "1"},
+    "status": {"enum": ["SUCCESS", "INVALID", "ERROR", "TIMEOUT", "DENIED"]},
+    "action": {"type": "string", "pattern": "^[A-Z_]{1,40}$"},
+    "reason": {"type": "string", "maxLength": 2048},
+    "evidenceRefs": {"type": "array", "maxItems": 25, "items": {"type": "string", "maxLength": 128}},
+    "decisionExecutionId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "errorCode": {"type": "string", "maxLength": 128}
+  }
+}

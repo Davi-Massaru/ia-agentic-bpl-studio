@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ config.get('STUDIO_CSRF_TOKEN', '') }}">
+{% set pages = [('explorer', 'Workflow Explorer'), ('designer', 'Agentic BPL Designer'), ('test_trace', 'Test & Trace'), ('publisher', 'Workflow Publisher')] %}
+<title>{% for endpoint, label in pages %}{% if request.endpoint == endpoint %}{{ label }} — {% endif %}{% endfor %}Agentic BPL Studio</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='trace-view.js') }}" defer></script>
+<script src="{{ url_for('static', filename='studio.js') }}" defer></script>
+<script src="{{ url_for('static', filename='settings.js') }}" defer></script></head>
+<body data-page="{{ request.endpoint }}" data-api="{{ request.script_root }}/api/v1" data-root="{{ request.script_root }}">
+<header class="app-header"><div class="brand"><span class="brand-mark" aria-hidden="true">S</span><div><strong>Agentic BPL Studio</strong><small>INTERSYSTEMS IRIS · AI HUB</small></div></div><div class="environment"><span class="connection-dot" id="connection-dot"></span><span id="environment-label">Environment not verified</span></div></header>
+<nav aria-label="Studio screens">{% for endpoint, label in pages %}<a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}><span class="nav-index">0{{ loop.index }}</span>{{ label }}</a>{% endfor %}</nav>
+<div class="settings-toolbar"><button type="button" id="open-settings" aria-haspopup="dialog">⚙ Settings</button></div>
+<main id="content"><div id="notice" class="warning" role="status" aria-live="polite">Connecting to the IRIS control plane…</div>{% block content %}{% endblock %}</main>
+<dialog id="studio-settings" aria-labelledby="settings-title">
+<div class="section-heading"><div><p class="eyebrow">ENVIRONMENT / AI HUB</p><h2 id="settings-title">Settings</h2></div><button type="button" id="close-settings" aria-label="Close settings">Close</button></div>
+<p>Configure the provider for platform agents. Saving does not call the model.</p>
+<form id="settings-form" class="stack" autocomplete="off">
+<label for="settings-provider">Provider</label><select id="settings-provider" name="provider" required><option value="">Select a provider</option><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option></select>
+<label for="settings-model">Model</label><input id="settings-model" name="model" maxlength="128" placeholder="Model identifier" required autocomplete="off">
+<label for="settings-api-key">Provider credential</label><input id="settings-api-key" name="apiKey" type="password" maxlength="1024" autocomplete="off" placeholder="Enter the key locally; it will never be displayed again">
+<p class="hint" id="settings-credential-state">Checking secure configuration…</p>
+<p class="hint">Storage: IRIS Wallet and Config Store. Leave the credential blank to keep a saved key or save only provider and model preferences.</p>
+<div id="settings-status" role="status" aria-live="polite"></div>
+<button class="primary" type="submit" id="save-settings">Save settings</button>
+</form></dialog>
+<footer><span>CONTROL PLANE / STUDIO</span><span>Execution and routing use native BPL. Evidence appears only when captured.</span></footer></body></html>

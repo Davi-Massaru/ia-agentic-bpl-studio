@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-28",
+  "irisBuild": "2026.3.0AI.154.0",
+  "python": "3.12.3",
+  "sourceClasses": 48,
+  "allClassesCompiled": true,
+  "pythonTestsPassed": 126,
+  "nativeTests": {
+    "DecisionValidatorTest": true,
+    "InputMapperTest": true
+  },
+  "liveReceipt": "embedded-python-live.json",
+  "liveInteropSession": 1136,
+  "liveAgentSessions": [
+    "26",
+    "27"
+  ],
+  "liveResult": "SUCCESS/C",
+  "migrationScope": "Decision validation, route resolution, stock candidate and observed-tool policy. SDK orchestration and ToolSet callbacks remain ObjectScript.",
+  "limitation": "Python ToolSet callbacks timed out in queued Production tests on this build; isolated native terminal calls succeeded. Root cause not established.",
+  "classes": [
+    {
+      "file": "src/iris/Studio/Admin/BPLReader.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/Admin/CapabilityProbe.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/ControlPlane.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/Installer.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/RuntimeBridge.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/RuntimeProbe.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/Settings.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/TestHarness.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/ToolRegistry.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/WebSetup.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/WorkflowTestHarness.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Admin/Workspace.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/AI/AgentRuntimeAdapter.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/AI/DecisionValidator.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/CandidateValidator.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/DecisionOperation.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Harness.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Inventory.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/ManagedPolicy.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Production.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/ReceiptOperation.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Request.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Response.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Routing.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/BloodDemo/Service.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Demo/AcknowledgeOperation.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Demo/Production.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Examples/NativeAgentService.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Examples/NativeAgentWorkflow.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Interop/AgentDecisionOperation.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Interop/PortableAgentOperation.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Interop/WorkflowService.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Model/AgentDefinition.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Model/DecisionBinding.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Model/WorkflowDraft.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Model/WorkflowRelease.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/AgentRequest.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/DecisionRequest.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/DecisionResponse.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/StockWorkflowRequest.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/WorkflowRequest.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Msg/WorkflowResponse.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Runtime/Envelope.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Runtime/InputMapper.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Runtime/Python.cls",
+      "embeddedPython": true
+    },
+    {
+      "file": "src/iris/Studio/Runtime/Releases.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Tools/BloodStockTools.cls",
+      "embeddedPython": false
+    },
+    {
+      "file": "src/iris/Studio/Tools/EventReadTools.cls",
+      "embeddedPython": false
+    }
+  ]
+}

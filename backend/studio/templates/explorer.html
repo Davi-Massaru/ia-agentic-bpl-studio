@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<div class="page-heading"><div><p class="eyebrow">01 / CONTEXT AND PROCESSES</p><h1>Workflow Explorer</h1><p class="subtitle">Select a Production and open its BPL process.</p></div><button id="refresh-explorer" type="button">Refresh environment ↻</button></div>
+<div class="workspace explorer-layout"><aside class="panel"><p class="section-kicker">AUTHORIZED NAMESPACE</p><h2 id="namespace-name">—</h2><label for="production">Production</label><select id="production"><option value="">Loading…</option></select><p class="hint">Only resources authorized for your identity.</p><hr><h3>New workflow</h3><p class="hint">Create a draft from a managed, versioned template.</p><label for="template">Template</label><select id="template"><option value="">Loading template catalog…</option></select><p id="template-description" class="hint">Select a template supplied by IRIS.</p><button id="create-workflow" type="button" class="primary" disabled>Create managed workflow</button></aside>
+<section class="panel"><div class="section-heading"><h2>Business Processes</h2><span id="workflow-count" class="pill">0 processes</span></div><label class="sr-only" for="workflow-search">Filter by class or name</label><input id="workflow-search" type="search" placeholder="Search class or name…"><div class="table-wrap"><table><thead><tr><th>Workflow / BPL class</th><th>Revision</th><th>Editing</th><th>Action</th></tr></thead><tbody id="workflow-list"><tr><td colspan="4" class="empty">Waiting for the IRIS catalog.</td></tr></tbody></table></div><p class="hint">Unrecognized BPL remains read-only. Only recognized sections can be changed.</p></section></div>
+<section class="panel" aria-labelledby="component-title">
+<p class="eyebrow">NATIVE BPL / NO TEMPLATE REQUIRED</p><h2 id="component-title">Create an AI Hub component</h2>
+<p>Select a Production above. Create or select an agent revision, publish an Operation, then call it anywhere a native BPL Call is valid. Compose branches, loops and multiple agent calls in the native editor.</p>
+<label for="component-agent">Existing agent revision</label><select id="component-agent"><option value="">Create a new agent</option></select>
+<details><summary>Create or version an agent independently of a workflow</summary>
+<label for="component-agent-id">Agent ID</label><input id="component-agent-id" placeholder="my-decision-agent">
+<label for="component-base">Base revision (0 = new)</label><input id="component-base" type="number" min="0" value="0">
+<label for="component-provider">Provider configured in Settings</label><select id="component-provider"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option></select>
+<label for="component-model">Model</label><input id="component-model" placeholder="Configured model name">
+<label for="component-prompt">Instructions</label><textarea id="component-prompt" rows="5" placeholder="Describe the decision, required evidence and allowed JSON actions."></textarea>
+<label for="component-tools">Authorized READ ToolSets (select one or more)</label><select id="component-tools" multiple size="3"></select>
+<button id="component-save-agent" type="button">Save agent revision</button></details>
+<label for="component-host">New Operation name</label><input id="component-host" placeholder="AIEventDecision">
+<label for="component-actions">Allowed actions (comma separated)</label><input id="component-actions" value="ACCEPT,REVIEW">
+<label for="component-fallback">Fallback action returned to the BPL</label><input id="component-fallback" value="REVIEW">
+<label for="component-policy">Server validation</label><select id="component-policy"><option value="schema">JSON schema and allowed actions</option><option value="blood-stock">Getting Started: stock policy and observed ReadStock</option></select>
+<p class="hint">Publication adds a new Operation; existing hosts and BPL sources are preserved. Configure the caller's timeout, mappings, status handling and routing in the native BPL editor. Credentials stay in Wallet.</p>
+<button id="component-publish" class="primary" type="button">Publish AI Hub Operation</button>
+<p><a href="/csp/user/EnsPortal.ProductionConfig.zen?$NAMESPACE=USER" target="_blank" rel="noopener">Open native Production configuration ↗</a> · <a href="/csp/user/EnsPortal.BPLEditor.zen?$NAMESPACE=USER" target="_blank" rel="noopener">Compose in native BPL editor ↗</a></p>
+<pre id="component-result">No component published in this session.</pre>
+</section>
+<details class="panel evidence"><summary>Detected capabilities</summary><pre id="capabilities-data">No evidence received.</pre></details>
+{% endblock %}

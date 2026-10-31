@@ -1,0 +1,224 @@
+{
+  "ok": true,
+  "runs": [
+    {
+      "action": "REVIEW",
+      "agentRevision": 1,
+      "agentSessionId": "",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A82EEBE9-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A82EEBE9-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockReview",
+      "errorCode": "STOCK_POLICY_REJECTED",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "INVALID",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockReview"
+        }
+      ],
+      "executionId": "A82EEBE9-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1232,
+      "messageId": "1232",
+      "mode": "SIMULATION",
+      "observations": [
+        {
+          "durationMs": 0.999429,
+          "endTime": "2026-10-28 13:37:02Z",
+          "executionId": "A82EEBE9-D2D4-11F1-B681-0242AC120002",
+          "id": "A830B098-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:37:02Z",
+          "status": "INVALID",
+          "traceId": "A82EEBE9-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "STOCK_POLICY_REJECTED",
+        "reason": "[REDACTED]",
+        "status": "INVALID"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 82,
+        "mode": "SIMULATION"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockReview",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1171",
+      "responseBodyId": "1174",
+      "source": "native-IRIS-Production",
+      "status": "INVALID",
+      "toolCalls": [],
+      "usage": {
+        "providerInvoked": false,
+        "source": "SIMULATION"
+      }
+    },
+    {
+      "action": "REVIEW",
+      "agentRevision": 1,
+      "agentSessionId": "",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A83911E5-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A83911E5-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockReview",
+      "errorCode": "STOCK_POLICY_REJECTED",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "INVALID",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockReview"
+        }
+      ],
+      "executionId": "A83911E5-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1239,
+      "messageId": "1239",
+      "mode": "SIMULATION",
+      "observations": [
+        {
+          "durationMs": 0.940167,
+          "endTime": "2026-10-28 13:37:02Z",
+          "executionId": "A83911E5-D2D4-11F1-B681-0242AC120002",
+          "id": "A83AB4BD-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:37:02Z",
+          "status": "INVALID",
+          "traceId": "A83911E5-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "STOCK_POLICY_REJECTED",
+        "reason": "[REDACTED]",
+        "status": "INVALID"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 82,
+        "mode": "SIMULATION"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockReview",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1178",
+      "responseBodyId": "1181",
+      "source": "native-IRIS-Production",
+      "status": "INVALID",
+      "toolCalls": [],
+      "usage": {
+        "providerInvoked": false,
+        "source": "SIMULATION"
+      }
+    },
+    {
+      "action": "REVIEW",
+      "agentRevision": 1,
+      "agentSessionId": "",
+      "bindingId": "746402cd209a41ee:decision",
+      "bplClass": "Studio.Managed.W746402cd209a41eeR3",
+      "bplHost": "StudioW746402cd209a41eeR3",
+      "correlationId": "A84340BA-D2D4-11F1-B681-0242AC120002",
+      "decisionExecutionId": "A84340BA-D2D4-11F1-B681-0242AC120002",
+      "destination": "StockReview",
+      "errorCode": "STOCK_POLICY_REJECTED",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "INVALID",
+          "step": "StudioW746402cd209a41eeR3"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "StockReview"
+        }
+      ],
+      "executionId": "A84340BA-D2D4-11F1-B681-0242AC120002",
+      "input": {
+        "group": "[REDACTED]",
+        "units": "[REDACTED]"
+      },
+      "interopSessionId": 1246,
+      "messageId": "1246",
+      "mode": "SIMULATION",
+      "observations": [
+        {
+          "durationMs": 0.924181,
+          "endTime": "2026-10-28 13:37:02Z",
+          "executionId": "A84340BA-D2D4-11F1-B681-0242AC120002",
+          "id": "A844FD77-D2D4-11F1-B681-0242AC120002",
+          "metadata": {},
+          "name": "AgentDecision",
+          "parentObservationId": "",
+          "startTime": "2026-10-28 13:37:02Z",
+          "status": "INVALID",
+          "traceId": "A84340BA-D2D4-11F1-B681-0242AC120002",
+          "type": "operation",
+          "usage": {}
+        }
+      ],
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "STOCK_POLICY_REJECTED",
+        "reason": "[REDACTED]",
+        "status": "INVALID"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 82,
+        "mode": "SIMULATION"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:StockReview",
+      "releaseId": "e677e6110c2e4904b211dc025e6a4159",
+      "requestBodyId": "1185",
+      "responseBodyId": "1188",
+      "source": "native-IRIS-Production",
+      "status": "INVALID",
+      "toolCalls": [],
+      "usage": {
+        "providerInvoked": false,
+        "source": "SIMULATION"
+      }
+    }
+  ]
+}

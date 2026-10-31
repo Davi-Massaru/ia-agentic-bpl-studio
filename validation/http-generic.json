@@ -1,0 +1,150 @@
+{
+  "ok": true,
+  "workflowId": "a66c8c5bcdbc4eef",
+  "releaseId": "343653209869487e8794bfb29a134c12",
+  "trace": {
+    "action": "ACCEPT",
+    "agentRevision": 1,
+    "agentSessionId": "",
+    "bindingId": "a66c8c5bcdbc4eef:decision",
+    "bplClass": "Studio.Managed.Wa66c8c5bcdbc4eefR2",
+    "bplHost": "StudioWa66c8c5bcdbc4eefR2",
+    "correlationId": "E09A04C5-D2D4-11F1-B681-0242AC120002",
+    "decisionExecutionId": "E09A04C5-D2D4-11F1-B681-0242AC120002",
+    "destination": "AcceptOperation",
+    "errorCode": "",
+    "events": [
+      {
+        "status": "SUBMITTED",
+        "step": "StudioWorkflowService"
+      },
+      {
+        "status": "SUCCESS",
+        "step": "StudioWa66c8c5bcdbc4eefR2"
+      },
+      {
+        "status": "LOCAL_RECEIPT",
+        "step": "AcceptOperation"
+      }
+    ],
+    "executionId": "E09A04C5-D2D4-11F1-B681-0242AC120002",
+    "input": {
+      "description": "[REDACTED]",
+      "eventId": "[REDACTED]"
+    },
+    "interopSessionId": 1290,
+    "messageId": "1290",
+    "mode": "SIMULATION",
+    "observations": [
+      {
+        "durationMs": 0.903086,
+        "endTime": "2026-10-28 13:38:36Z",
+        "executionId": "E09A04C5-D2D4-11F1-B681-0242AC120002",
+        "id": "E09B8501-D2D4-11F1-B681-0242AC120002",
+        "metadata": {},
+        "name": "AgentDecision",
+        "parentObservationId": "",
+        "startTime": "2026-10-28 13:38:36Z",
+        "status": "SUCCESS",
+        "traceId": "E09A04C5-D2D4-11F1-B681-0242AC120002",
+        "type": "operation",
+        "usage": {}
+      }
+    ],
+    "output": {
+      "action": "ACCEPT",
+      "errorCode": "",
+      "reason": "[REDACTED]",
+      "status": "SUCCESS"
+    },
+    "rawResponse": {
+      "content": "[REDACTED]",
+      "length": 51,
+      "mode": "SIMULATION"
+    },
+    "reason": "[REDACTED]",
+    "receipt": "LOCAL_ONLY:AcceptOperation",
+    "releaseId": "343653209869487e8794bfb29a134c12",
+    "requestBodyId": "1228",
+    "responseBodyId": "1231",
+    "source": "native-IRIS-Production",
+    "status": "SUCCESS",
+    "toolCalls": [],
+    "usage": {
+      "providerInvoked": false,
+      "source": "SIMULATION"
+    },
+    "validated": {
+      "action": "ACCEPT",
+      "evidenceRefs": [],
+      "reason": "[REDACTED]",
+      "status": "SUCCESS"
+    }
+  },
+  "authenticatedHTTP": true,
+  "liveAIValidated": false,
+  "rollbackDraftRevision": 4,
+  "nativeDeadlineTrace": {
+    "action": "REVIEW",
+    "agentRevision": 1,
+    "agentSessionId": "",
+    "bindingId": "a66c8c5bcdbc4eef:decision",
+    "bplClass": "Studio.Managed.Wa66c8c5bcdbc4eefR5",
+    "bplHost": "StudioWa66c8c5bcdbc4eefR5",
+    "correlationId": "E17A1407-D2D4-11F1-B681-0242AC120002",
+    "decisionExecutionId": "E17A1407-D2D4-11F1-B681-0242AC120002",
+    "destination": "ReviewOperation",
+    "errorCode": "DECISION_DEADLINE_EXCEEDED",
+    "events": [
+      {
+        "status": "SUBMITTED",
+        "step": "StudioWorkflowService"
+      },
+      {
+        "status": "TIMEOUT",
+        "step": "StudioWa66c8c5bcdbc4eefR5"
+      },
+      {
+        "status": "LOCAL_RECEIPT",
+        "step": "ReviewOperation"
+      }
+    ],
+    "executionId": "E17A1407-D2D4-11F1-B681-0242AC120002",
+    "input": {
+      "description": "[REDACTED]",
+      "eventId": "[REDACTED]"
+    },
+    "interopSessionId": 1298,
+    "messageId": "1298",
+    "mode": "SIMULATION",
+    "observations": [
+      {
+        "executionId": "E17A1407-D2D4-11F1-B681-0242AC120002",
+        "id": "E17B9A42-D2D4-11F1-B681-0242AC120002",
+        "metadata": {},
+        "name": "AgentDecision",
+        "parentObservationId": "",
+        "startTime": "2026-10-28 13:38:38Z",
+        "status": "RUNNING",
+        "traceId": "E17A1407-D2D4-11F1-B681-0242AC120002",
+        "type": "operation"
+      }
+    ],
+    "output": {
+      "action": "REVIEW",
+      "errorCode": "DECISION_DEADLINE_EXCEEDED",
+      "reason": "[REDACTED]",
+      "status": "TIMEOUT"
+    },
+    "reason": "[REDACTED]",
+    "receipt": "LOCAL_ONLY:ReviewOperation",
+    "releaseId": "bba40054e9ba4de08908e3be0e2fa30c",
+    "requestBodyId": "1235",
+    "responseBodyId": "1238",
+    "source": "native-IRIS-Production",
+    "status": "TIMEOUT",
+    "toolCalls": []
+  },
+  "deadlineMs": 1000,
+  "injectedDelayMs": 2000
+}

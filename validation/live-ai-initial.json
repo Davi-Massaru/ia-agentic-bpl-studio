@@ -1,0 +1,173 @@
+{
+  "checkedAt": "2026-10-27T00:58:55.605295+00:00",
+  "ok": false,
+  "mode": "LIVE",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "runs": [
+    {
+      "action": "ACCEPT",
+      "agentRevision": 1,
+      "agentSessionId": "1",
+      "bindingId": "92b2469eb1514304:decision",
+      "bplClass": "Studio.Managed.W92b2469eb1514304R2",
+      "bplHost": "StudioW92b2469eb1514304R2",
+      "correlationId": "969C90DF-D1A1-11F1-B73A-0242AC120002",
+      "decisionExecutionId": "969C90DF-D1A1-11F1-B73A-0242AC120002",
+      "destination": "AcceptOperation",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "SUCCESS",
+          "step": "StudioW92b2469eb1514304R2"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "AcceptOperation"
+        }
+      ],
+      "executionId": "969C90DF-D1A1-11F1-B73A-0242AC120002",
+      "input": {
+        "description": "[REDACTED]",
+        "eventId": "[REDACTED]"
+      },
+      "interopSessionId": 833,
+      "messageId": "833",
+      "mode": "LIVE",
+      "output": {
+        "action": "ACCEPT",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 61,
+        "mode": "LIVE"
+      },
+      "reason": "[REDACTED]",
+      "receipt": "LOCAL_ONLY:AcceptOperation",
+      "releaseId": "e02fbc2bbe87480f8e09e70ce0b54069",
+      "requestBodyId": "813",
+      "responseBodyId": "816",
+      "source": "native-IRIS-Production",
+      "status": "SUCCESS",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "name": "ReadEvent",
+          "result": {
+            "eligible": true,
+            "eventId": "E-OK",
+            "evidenceRef": "event:E-OK",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 114,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 37,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 4321,
+        "total_prompt_tokens": 308,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "ACCEPT",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "agentRevision": 1,
+      "bindingId": "92b2469eb1514304:decision",
+      "bplClass": "Studio.Managed.W92b2469eb1514304R2",
+      "bplHost": "StudioW92b2469eb1514304R2",
+      "correlationId": "99718994-D1A1-11F1-B73A-0242AC120002",
+      "destination": "ReviewOperation",
+      "errorCode": "",
+      "events": [
+        {
+          "status": "SUBMITTED",
+          "step": "StudioWorkflowService"
+        },
+        {
+          "status": "ERROR",
+          "step": "StudioW92b2469eb1514304R2"
+        },
+        {
+          "status": "LOCAL_RECEIPT",
+          "step": "ReviewOperation"
+        }
+      ],
+      "executionId": "99718994-D1A1-11F1-B73A-0242AC120002",
+      "input": {
+        "description": "[REDACTED]",
+        "eventId": "[REDACTED]"
+      },
+      "interopSessionId": 840,
+      "messageId": "840",
+      "mode": "LIVE",
+      "output": {
+        "action": "REVIEW",
+        "errorCode": "",
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      },
+      "rawResponse": {
+        "content": "[REDACTED]",
+        "length": 154,
+        "mode": "LIVE"
+      },
+      "releaseId": "e02fbc2bbe87480f8e09e70ce0b54069",
+      "requestBodyId": "820",
+      "source": "native-IRIS-Production",
+      "status": "ERROR",
+      "toolCalls": [
+        {
+          "effect": "READ",
+          "name": "ReadEvent",
+          "result": {
+            "eligible": false,
+            "eventId": "E-REVIEW",
+            "evidenceRef": "event:E-REVIEW",
+            "synthetic": true
+          },
+          "source": "instrumented-tool"
+        }
+      ],
+      "usage": {
+        "current_context_tokens": 141,
+        "model_context_size": 1047576,
+        "total_cache_creation_tokens": 0,
+        "total_cache_read_tokens": 0,
+        "total_completion_tokens": 53,
+        "total_interactions": 2,
+        "total_llm_duration_ms": 2594,
+        "total_prompt_tokens": 313,
+        "total_reasoning_tokens": 0,
+        "total_tool_calls": 1,
+        "total_tool_duration_ms": 0
+      },
+      "validated": {
+        "action": "REVIEW",
+        "evidenceRefs": [],
+        "reason": "[REDACTED]",
+        "status": "SUCCESS"
+      }
+    }
+  ],
+  "workflowId": "92b2469eb1514304",
+  "releaseId": "e02fbc2bbe87480f8e09e70ce0b54069"
+}

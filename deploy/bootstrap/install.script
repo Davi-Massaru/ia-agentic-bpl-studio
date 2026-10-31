@@ -1,0 +1,14 @@
+Set sc=$SYSTEM.OBJ.LoadDir("/opt/studio/src/Studio","ck",,1)
+If $SYSTEM.Status.IsError(sc) Do $SYSTEM.Status.DisplayError(sc) Halt
+Set sc=##class(Studio.Admin.ControlPlane).Initialize()
+If $SYSTEM.Status.IsError(sc) Do $SYSTEM.Status.DisplayError(sc) Halt
+Set sc=##class(Ens.Director).GetProductionStatus(.production,.state)
+If production'="",production'="Studio.BloodDemo.Production",production'="Studio.Demo.Production" Write "UNRELATED_PRODUCTION_RUNNING",! Halt
+If production="Studio.BloodDemo.Production",state=1 Set sc=##class(Ens.Director).StopProduction()
+If $SYSTEM.Status.IsError(sc) Do $SYSTEM.Status.DisplayError(sc) Halt
+Write "STUDIO_RECONCILE=",##class(Studio.Admin.Workspace).ReconcileDeployments(),!
+Set sc=##class(Ens.Director).GetProductionStatus(.production,.state)
+If state'=1 Set sc=##class(Ens.Director).StartProduction("Studio.Demo.Production")
+If $SYSTEM.Status.IsError(sc) Do $SYSTEM.Status.DisplayError(sc) Halt
+Write "STUDIO_BOOTSTRAP_OK=1",!
+Halt

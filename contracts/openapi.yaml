@@ -1,0 +1,291 @@
+openapi: 3.0.3
+info:
+  title: Agentic BPL Studio Admin API
+  version: 1.0.0
+  description: |
+    CONTRATO PROPOSTO DO STUDIO, NÃO API NATIVA DA INTERSYSTEMS.
+    Endpoints mutantes exigem autorização, CSRF ou token válido, replay/etag
+    e validação server-side. O scaffold retorna 501 enquanto IRIS não conectado.
+servers:
+  - url: /api/v1
+paths:
+  /capabilities:
+    get:
+      summary: Descobrir ambiente e build; sem modificações
+      operationId: getCapabilities
+      responses:
+        '200': {description: Estado validado por adapter IRIS}
+        '501': {description: Gateway IRIS indisponível}
+  /productions:
+    get:
+      summary: Listar Productions autorizadas da namespace corrente
+      operationId: listProductions
+      responses:
+        '200': {description: Lista de Productions}
+        '403': {description: Sem privilégio}
+  /workflows:
+    get:
+      summary: Listar BPLs associados a Production
+      operationId: listWorkflows
+      parameters:
+        - in: query
+          name: production
+          required: true
+          schema: {type: string, maxLength: 256}
+      responses:
+        '200': {description: Lista de workflows}
+    post:
+      summary: Criar draft BPL a partir de template gerenciado
+      operationId: createWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [templateId, production]
+              properties:
+                templateId: {type: string, enum: [decision-routing-v1]}
+                production: {type: string}
+      responses:
+        '201': {description: Draft criado}
+        '403': {description: Sem privilégio}
+  /workflows/{workflowId}:
+    get:
+      summary: Ler BPL e indicar suporte de edição
+      operationId: getWorkflow
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      responses:
+        '200': {description: BPL e metadados de managed slot}
+        '404': {description: Não encontrado}
+  /workflows/{workflowId}/validate:
+    post:
+      summary: Validar draft e dependências sem publicar
+      operationId: validateWorkflow
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      responses:
+        '200': {description: Relatório de validação}
+        '409': {description: Revisão divergente}
+  /workflows/{workflowId}/preview:
+    post:
+      summary: Exibir diff e plano de publicação
+      operationId: previewWorkflow
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      responses:
+        '200': {description: Diff e dependências}
+  /workflows/{workflowId}/publish:
+    post:
+      summary: Publicar revisão gerenciada após confirmação explícita
+      operationId: publishWorkflow
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: {type: string}
+        - in: header
+          name: If-Match
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [draftRevision, approvalRef, confirmed]
+              properties:
+                draftRevision: {type: integer, minimum: 1}
+                approvalRef: {type: string}
+                confirmed: {type: boolean, enum: [true]}
+      responses:
+        '201': {description: Release publicada e compilada}
+        '403': {description: Sem permissão de publicação}
+        '409': {description: Draft ou fonte divergente}
+        '422': {description: Falha de validação/compilação}
+  /workflows/{workflowId}/releases:
+    get:
+      summary: Listar histórico de releases do workflow
+      operationId: listWorkflowReleases
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      responses:
+        '200': {description: Releases imutáveis}
+  /agents:
+    get:
+      summary: Listar configurações de agentes versionadas
+      operationId: listAgents
+      responses:
+        '200': {description: Agentes autorizados}
+  /agents/{agentId}:
+    put:
+      summary: Criar revisão gerenciada de configuração agêntica
+      operationId: saveAgentDefinition
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [definition, baseRevision]
+              properties:
+                baseRevision: {type: integer, minimum: 0}
+                definition:
+                  type: object
+                  additionalProperties: false
+                  required: [providerRef, modelName, prompt]
+                  properties:
+                    providerRef: {type: string, minLength: 1, maxLength: 256}
+                    modelName: {type: string, minLength: 1, maxLength: 256}
+                    prompt: {type: string, minLength: 1, maxLength: 32000}
+                    toolSetRefs:
+                      type: array
+                      maxItems: 40
+                      items: {type: string, minLength: 1, maxLength: 256}
+      responses:
+        '200': {description: Revisão criada}
+        '403': {description: Sem permissão}
+  /toolsets:
+    get:
+      summary: Listar ToolSets instaladas e autorizadas
+      operationId: listToolsets
+      responses:
+        '200': {description: Catálogo com read/write, schemas e compatibilidade}
+  /bindings/{bindingId}:
+    put:
+      summary: Salvar binding Input-Agent-Output de um draft
+      operationId: saveBinding
+      parameters:
+        - in: path
+          name: bindingId
+          required: true
+          schema: {type: string}
+        - in: header
+          name: If-Match
+          required: true
+          description: Expected binding revision, represented as a strong ETag containing an integer.
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DecisionBinding'}
+      responses:
+        '200': {description: Versão de draft do binding}
+        '409': {description: Conflito de revisão}
+  /test-runs:
+    post:
+      summary: Acionar Business Service sintético (não agente isolado)
+      operationId: executeTestRun
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [releaseId, mode, payload]
+              properties:
+                releaseId: {type: string}
+                mode: {type: string, enum: [live]}
+                payload: {type: object}
+      responses:
+        '202': {description: Execução da Production iniciada}
+        '403': {description: Test Harness não autorizado}
+  /runs/{executionId}:
+    get:
+      summary: Execução de mensagens com correlação AI Hub
+      operationId: getRun
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '200': {description: Timeline auditada; dados não capturados ficam ausentes}
+  /workflows/{workflowId}/decision-slot:
+    post:
+      summary: Insert the single managed decision slot in a versioned draft
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expectedRevision]
+              properties:
+                expectedRevision: {type: integer, minimum: 1}
+      responses:
+        '200': {description: Updated managed draft}
+        '409': {description: Stale revision or slot already present}
+  /workflows/{workflowId}/preview-input:
+    post:
+      summary: Validate typed mappings and preview redacted input
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [binding, example]
+              properties:
+                binding: {$ref: '#/components/schemas/DecisionBinding'}
+                example: {type: object}
+      responses:
+        '200': {description: Redacted input and validation issues}
+  /workflows/{workflowId}/rollback:
+    post:
+      summary: Restore immutable release configuration as a new draft
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [releaseId, expectedRevision]
+              properties:
+                releaseId: {type: string}
+                expectedRevision: {type: integer, minimum: 1}
+      responses:
+        '200': {description: New draft requiring normal validation and publication}
+        '409': {description: Draft revision changed}
+components:
+  parameters:
+    WorkflowId:
+      in: path
+      name: workflowId
+      required: true
+      schema: {type: string}
+  schemas:
+    DecisionBinding:
+      type: object
+      required: [bindingId, agentRef, inputs, outputs, routes, fallback]
+      properties:
+        bindingId: {type: string}
+        agentRef:
+          type: object
+          required: [id, revision]
+          properties:
+            id: {type: string}
+            revision: {type: integer, minimum: 1}
+        inputs: {type: array, items: {type: object}}
+        outputs: {type: object}
+        routes: {type: object}
+        fallback: {type: object}
