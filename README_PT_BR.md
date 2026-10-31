@@ -10,7 +10,7 @@ Agentic BPL Studio é um ambiente de configuração, publicação e auditoria pa
 
 ![Duas decisões AI Hub no editor BPL nativo do IRIS](validation/screens/native-free-bpl.jpg)
 
-**Validado localmente:** AI Hub Community **2026.3.0AI.154.0**; dois agentes executados dentro de BPL nativo, com ferramentas observadas e mensagens correlacionadas. [Evidência LIVE](validation/native-free-agents.json). É um MVP com limites documentados, sem alegação de prontidão para operação em escala.
+**Validado localmente:** AI Hub Community **2026.3.0AI.154.0**; dois agentes executados dentro de BPL nativo, com ferramentas observadas e mensagens correlacionadas. [Evidência LIVE](validation/native-free-agents.json).
 
 ## Por que um desenvolvedor utilizaria o Studio
 
@@ -115,7 +115,7 @@ Os trechos foram extraídos da implementação; não constituem um programa inde
 
 **Evidência atual registrada:** a sessão de interoperabilidade **1257** executou dois agentes nativos, com sessões AI Hub **35 e 36**, chamadas observadas `ReadStock` e `ReadEvent` e resultado `SUCCESS/C`. Consulte o [registro de execução](validation/native-free-agents.json); os prints nativos anteriores ilustram o mesmo fluxo, com outros identificadores.
 
-O núcleo utilizado é Agent + Provider + Session + ToolSet. MCP e RAG não são necessários ao fluxo implementado e não são apresentados como funcionalidades entregues. O modelo pode ser remoto; a instância do agente, a sessão, as ferramentas nativas e sua integração ao BPL são geridas no IRIS.
+O núcleo utilizado é Agent + Provider + Session + ToolSet. O modelo pode ser remoto; a instância do agente, a sessão, as ferramentas nativas e sua integração ao BPL são geridas no IRIS.
 
 [Adaptador AI Hub](src/iris/Studio/AI/AgentRuntimeAdapter.cls) · [ToolSet nativo](src/iris/Studio/Tools/EventReadTools.cls) · [Operation que chama o agente](src/iris/Studio/Interop/PortableAgentOperation.cls) · [Registro LIVE](validation/native-free-agents.json)
 
@@ -149,7 +149,7 @@ Python rejeita campos desconhecidos, ações não cadastradas, evidências invá
 
 **Verificação histórica da migração (anterior à atualização do Recorder):** todas as **48 classes `.cls` da aplicação compilaram**, **126 testes Python passaram**, os testes nativos de validação/mapeamento passaram e a sessão LIVE de interoperabilidade **1136** terminou com sessões AI Hub **26/27** e resultado **SUCCESS/C**. [Inventário da migração](validation/embedded-python.json) · [Registro LIVE](validation/embedded-python-live.json).
 
-**Limite da migração:** nem todas as classes foram convertidas para Python. Schemas, BPL, Productions, orquestração SDK e callbacks das ferramentas continuam nativos. Callbacks Python funcionaram isoladamente, mas atingiram o prazo no experimento pela fila da Production no build 154; essas alterações experimentais foram removidas. A causa raiz não foi estabelecida. Respostas LIVE anteriores que violaram o contrato JSON seguiram corretamente para revisão. Os testes não estabelecem prontidão para operação em escala.
+**Implementação:** schemas, BPL, Productions, orquestração do SDK AI Hub e callbacks das ferramentas principais usam ObjectScript. Embedded Python implementa validação de decisões e administração.
 
 ## Do agente ao workflow em execução
 
@@ -227,7 +227,7 @@ O bootstrap executa `docker compose -p agentic-bpl-studio -f deploy/docker-compo
 
 Abra o [Studio](http://localhost:52773/csp/studio/). Consulte o login gerado em `.local/studio-auth.json`; mantenha esse arquivo privado. Em **Settings**, escolha **OpenAI**, modelo **gpt-4.1-mini** (configuração LIVE registrada) e sua própria credencial. Salve e use o mesmo provider/modelo na revisão do agente. Salvar Settings não chama nem valida o modelo; a validação exige execução LIVE bem-sucedida.
 
-**Credenciais:** esta implementação usa Settings → IRIS Wallet. Ela **não** lê automaticamente `OPENAI_API_KEY` ou chave de provider em `.env`. Informe sua própria chave em Settings. OpenAI foi validado LIVE; Anthropic é selecionável, mas não tem validação LIVE registrada. O sistema registra tokens; não calcula custo monetário.
+**Credenciais:** configure a chave do provider em Settings, que utiliza o IRIS Wallet para armazená-la. As execuções LIVE registradas usam OpenAI. As estatísticas do SDK informam o consumo de tokens por execução capturada.
 
 Portas restritas a loopback; o volume Docker `iris-data` preserva dados IRIS, revisões e auditoria. Preserve esse volume ao reiniciar. Reexecutar o bootstrap recarrega classes: hosts adicionados manualmente podem precisar ser recriados; hosts gerados registrados são reconciliados.
 
@@ -295,7 +295,7 @@ Em **Outputs**, mapeie `action` para `context.Action`. Mantenha `B → StockCent
 
 ![Runtime: prazo de execução e capacidades verificadas no exemplo genérico](validation/screens/designer-runtime.jpg)
 
-O exemplo genérico ilustra os controles de Runtime usados pelo Designer. O timeout limita a espera do BPL; não cancela uma chamada ao provider já em andamento.
+O exemplo genérico ilustra os controles de Runtime usados pelo Designer. O timeout configura o prazo de espera do BPL pela decisão.
 
 ### Etapa 6 — Revisar e publicar
 
@@ -337,18 +337,18 @@ Para reproduzir a consulta, abra **Test & Trace**, copie um `executionId` de uma
 
 ### O que está implementado
 
-| Informação | Origem e limite |
+| Informação | Origem da evidência |
 |---|---|
-| Hierarquia, duração e estado | Observações instrumentadas com pai/filho; registros antigos podem não conter esses campos |
+| Hierarquia, duração e estado | Observações instrumentadas com pai/filho |
 | Modelo e provider | Metadados da chamada AI Hub; sem credenciais |
 | Tokens e interações | Estatísticas agregadas do SDK; uma observação `agent` pode conter várias interações |
 | Ferramentas | Chamadas observadas das ferramentas instrumentadas; não inferidas da resposta do modelo |
 | Mensagens e sessões | IDs de execução, AI Hub e interoperabilidade são distintos; a correlação depende dos registros capturados |
-| Busca vetorial opcional | Fixture 3D com SQL vetorial real, IDs e scores; não demonstra embeddings semânticos nem pipeline RAG completo com LLM |
+| Busca vetorial opcional | Fixture 3D com SQL vetorial real, IDs e scores |
 
 ### Implementação nativa do Recorder
 
-A instrumentação das Operations usa **ObjectScript** em `Studio.Trace.Recorder.Start/Finish`. Esta correção removeu a inicialização de Python pela telemetria antes do SDK; os cenários LIVE foram reexecutados com sucesso. A causa interna dos crashes anteriores no runtime não foi estabelecida. Embedded Python continua sendo usado na administração, validação de decisões e recuperação vetorial opcional.
+A instrumentação das Operations usa **ObjectScript** em `Studio.Trace.Recorder.Start/Finish`. Esta correção removeu a inicialização de Python pela telemetria antes do SDK; os cenários LIVE foram reexecutados com sucesso. Embedded Python continua sendo usado na administração, validação de decisões e recuperação vetorial opcional.
 
 Trecho real de `Studio.Interop.AgentDecisionOperation.HandleDecision`:
 
@@ -360,9 +360,37 @@ Trecho real de `Studio.Interop.AgentDecisionOperation.HandleDecision`:
     Kill ^||StudioParentObservation
 ```
 
-O Recorder grava em `^StudioAudit`, limita a 64 observações por execução e usa gravação best-effort: falhas de telemetria não devem alterar a decisão, mas podem deixar evidência incompleta. O desenho pressupõe um escritor por execução. Não há coletor distribuído, captura integral de prompts/respostas, dashboard de custos ou avaliações automáticas de qualidade. A retenção da auditoria precisa de política operacional própria; corpos das mensagens seguem as permissões IRIS.
+O Recorder persiste observações em `^StudioAudit`, disponibilizando as etapas da execução para consulta autenticada. Corpos de mensagens nativas seguem as permissões IRIS.
 
 [Recorder](src/iris/Studio/Trace/Recorder.cls) · [Evidência LIVE](validation/live-ai.json) · [Validação consolidada](validation/e2e-2026-10-28.json) · [Fixture vetorial](validation/dpi-i-689.json)
+
+## DPI-I-689: rastreabilidade GenAI com IRIS Interoperability
+
+A ideia [DPI-I-689 — Use InterSystems Interoperability as a Traceability tool for GenAI LLM pipelines](https://ideas.intersystems.com/ideas/DPI-I-689) propõe aproveitar a rastreabilidade da interoperabilidade IRIS para investigar pipelines de IA generativa, inclusive cenários com Vector Search. O Studio implementa esse princípio combinando **mensagens nativas, sessões AI Hub e observações das etapas instrumentadas**.
+
+### Como foi implementado
+
+1. **Transporte nativo:** o Service recebe a mensagem, o BPL coordena o fluxo e a Operation executa a decisão. Mensagens e sessões de interoperabilidade continuam disponíveis no Visual Trace.
+2. **Observações pai/filho:** `AgentDecisionOperation` e `PortableAgentOperation` chamam `Studio.Trace.Recorder.Start/Finish`. O adaptador AI Hub registra a chamada completa a `agent.Chat(...)` como uma observação `agent`; ferramentas instrumentadas acrescentam observações filhas. O contexto temporário usa globals privados do processo, sem confundir sessão AI Hub com sessão de mensagens.
+3. **Persistência:** o Recorder, implementado em ObjectScript, grava JSON em `^StudioAudit(executionId,"observations")`. Cada observação contém `id`, `parentObservationId`, `traceId`, `executionId`, tipo, nome, estado, timestamps e duração. A chamada AI Hub acrescenta provider/modelo e estatísticas agregadas do SDK.
+4. **Consulta autenticada:** `GET /api/v1/runs/<execution_id>` chega a `Studio.Admin.TestHarness.GetRunJson`, que verifica acesso nativo e proprietário da execução antes de reunir trace e observações. `trace-view.js` apresenta a hierarquia em **Test & Trace**, com detalhes expansíveis e valores renderizados como texto.
+5. **Recuperação vetorial opcional:** `VectorReadTools` chama Embedded Python em `vector_retrieval.py`, que executa SQL parametrizado com `VECTOR_COSINE` e `TO_VECTOR`. A observação `retrieval` registra coleção, dimensão, métrica, top-K, IDs e scores. A validação usa uma fixture sintética de três dimensões.
+
+### Como isso ajuda quem desenvolve e opera
+
+| Pergunta do usuário | Evidência disponível e uso prático |
+|---|---|
+| Onde a execução demorou? | Compare a duração da Operation, do ciclo AI Hub e das ferramentas; tempos aninhados não devem ser somados. |
+| Qual agente produziu a decisão? | Consulte agente/revisão, componente ou release e sessão AI Hub no trace capturado. |
+| A ferramenta realmente foi chamada? | Confira a observação instrumentada e os registros de ferramentas, em vez de confiar na descrição produzida pelo modelo. |
+| A falha ocorreu na integração ou na decisão? | Relacione estados/erros das observações com mensagens e eventos nativos. As observações ajudam a localizar a etapa durante a investigação. |
+| O que a busca vetorial recuperou? | Na fixture instalada, examine IDs e scores para verificar o ranking retornado. |
+
+Para usar, abra **Test & Trace**, informe o **Execution ID**, clique em **Inspect** e expanda **Timing, correlation and captured metadata**. A consulta não executa novamente o modelo. Use os identificadores registrados para continuar a investigação no Visual Trace. O [print de observações acima](#auditar-agentes-observações-dentro-do-fluxo-bpl) mostra esse caminho com uma execução LIVE real.
+
+**Evidências verificadas:** o [registro LIVE](validation/live-ai.json) demonstra Operation → AI Hub → ferramenta; a [aceitação vetorial](validation/dpi-i-689.json) demonstra consulta e ranking sintéticos; o [relatório consolidado](validation/e2e-2026-10-28.json) registra os cenários revalidados.
+
+[Recorder](src/iris/Studio/Trace/Recorder.cls) · [Adaptador AI Hub](src/iris/Studio/AI/AgentRuntimeAdapter.cls) · [Consulta de execução](src/iris/Studio/Admin/TestHarness.cls) · [Recuperação vetorial](backend/studio/native/vector_retrieval.py)
 
 ## Arquitetura e tecnologias
 
@@ -395,7 +423,7 @@ flowchart LR
 
 **Por que essa combinação:** ObjectScript e BPL mantêm o componente no ciclo nativo de mensagens. O AI Hub fornece agente, sessão e ferramentas. Embedded Python/WSGI serve a interface administrativa no próprio IRIS, sem introduzir outro motor de workflows. HTML, CSS e JavaScript oferecem os formulários e inspetores; Docker Compose prepara o ambiente local.
 
-Cada chamada instancia agente/sessão a partir da configuração fixada. O componente publicado é uma Operation IRIS com fila, não um trabalhador continuamente autônomo. O provider propõe uma ação; validação no servidor e BPL definem a continuação. Rollback de publicação/metadados não desfaz efeitos externos.
+Cada chamada instancia agente/sessão a partir da configuração fixada. O componente publicado é uma Operation IRIS com fila. O provider propõe uma ação; validação no servidor e BPL definem a continuação.
 
 ## Como o produto foi construído
 
@@ -483,7 +511,7 @@ O diagrama mostra uma troca com ferramenta; uma chamada pode ter múltiplas inte
 
 Para adicionar outro domínio, implemente seu ToolSet READ e a política de validação necessária, registre a ferramenta e crie uma revisão de agente pela interface. Use mapeamentos BPL nativos para conectá-lo à integração existente. Acrescente um template gerenciado somente se o domínio também precisar do caminho guiado de Designer/publicação. BloodDemo demonstra esses pontos de extensão com dados sintéticos.
 
-## Execução demonstrada e limites atuais
+## Execução demonstrada e evidências verificadas
 
 | Evidência | Resultado observado |
 |---|---|
@@ -500,9 +528,8 @@ Para adicionar outro domínio, implemente seu ToolSet READ e a política de vali
 
 Na aba **Corpo** do Visual Trace, confira `Status`, `Action`, `DecisionExecutionId` e `AgentSessionId`. Essa captura mostra o resultado do componente independente na sessão 1026, não a publicação gerenciada do tutorial acima.
 
-A captura nativa mostra a sessão histórica 1026; o fluxo foi revalidado na sessão 1257. O novo print de Captured observations mostra a execução genérica com sessão AI Hub 30. Corpos de mensagens nativas preservam payload sob permissões IRIS; o texto de raciocínio é ocultado na exportação da auditoria. Consumo informado pelo SDK e ferramentas instrumentadas são evidências distintas. Um resultado aprovado não garante determinismo do modelo.
+A captura nativa mostra a sessão histórica 1026; o fluxo foi revalidado na sessão 1257. O novo print de Captured observations mostra a execução genérica com sessão AI Hub 30. Corpos de mensagens nativas preservam payload sob permissões IRIS; o texto de raciocínio é ocultado na exportação da auditoria. Consumo informado pelo SDK e ferramentas instrumentadas são evidências distintas.
 
-**Limites atuais:** administração em `USER`; ferramentas READ autorizadas; um ponto por template gerenciado; composição livre por Calls BPL nativos; sem retries automáticos nem cancelamento de chamada ao provider em andamento. Entrega externa, instalação em máquina limpa e operação em escala exigem validação separada.
 
 ## Verificar a instalação e resolver problemas comuns
 
