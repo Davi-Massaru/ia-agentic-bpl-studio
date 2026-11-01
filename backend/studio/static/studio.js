@@ -53,13 +53,13 @@
     } finally {
       if (button) button.disabled = wasDisabled;
       if (page === 'publisher') updatePublishButton();
-      if (page === 'designer') updateDesignerButtons();
+      if (page === 'designer') { updateDesignerButtons(); updateBlockButtons(); }
     }
   };
   const on = (id, event, callback) => $(id)?.addEventListener(event, callback);
   function updateDesignerButtons() {
     const loaded = state.workflow && state.loadedWorkflowId === workflowId();
-    const editable = loaded && state.workflow.managed === true;
+    const editable = loaded && state.workflow.managed === true && !blockSaving;
     for (const id of ['save-binding','save-agent','add-input','add-route','preview-input']) setDisabled(id, !editable);
     setDisabled('validate-workflow', !loaded);
     setDisabled('insert-decision', !editable || state.workflow.decisionSlotAvailable !== true);
@@ -210,9 +210,12 @@
   }
   function fillAgent(agent) {
     if (!agent) return;
+    const index=state.agents.findIndex(item=>item.agentId===(agent.agentId || agent.id) && item.revision===agent.revision);
+    if(index>=0 && !Array.from($('agent-select').options).some(option=>option.value===String(index))) $('agent-select').add(new Option(agent.agentId+' @'+agent.revision,String(index)));
+    $('agent-select').value=index>=0?String(index):'';
     $('agent-id').value = agent.agentId || agent.id || '';
     $('agent-revision').value = agent.revision || 1;
-    $('agent-base-revision').value = agent.revision || 0;
+    $('agent-base-revision').value = agent.latestRevision || agent.revision || 0;
     $('provider-ref').value = agent.providerRef || '';
     $('model-name').value = agent.modelName || '';
     $('agent-prompt').value = agent.prompt || '';
@@ -261,6 +264,7 @@
     show('input-preview', 'Mapping changed. Request a new IRIS preview.');
     try { show('binding-review', bindingPayload()); }
     catch (_) { show('binding-review', 'Complete the mappings to review the contract.'); }
+    if (!renderingBlocks) captureBlocks();
   }
   function addInputRow(mapping = {}) {
     const row = document.createElement('div'); row.className = 'mapping-row input-row';
@@ -321,7 +325,7 @@
     state.selectedNode = node;
     for (const button of document.querySelectorAll('#workflow-graph button')) button.setAttribute('aria-pressed', String(button.dataset.nodeId === String(node.id || node.name || '')));
     show('node-details', node);
-    if (decisionNode(node)) { $('tab-inputs').click(); $('binding-id').focus(); }
+    if (decisionNode(node)) { if (blockState && node.bindingId) chooseBlock(node.bindingId); $('tab-inputs').click(); $('binding-id').focus(); }
   }
   function showGraph(workflow) {
     const nodes = workflow.graph?.nodes || workflow.activities || [];
@@ -334,7 +338,7 @@
       const button = textElement('button', label, 'graph-select'); button.type = 'button'; button.dataset.nodeId = node.id || node.name || '';
       button.setAttribute('aria-pressed', 'false'); button.addEventListener('click', () => selectNode(node));
       card.append(button);
-      if (node.type) card.append(textElement('small', node.type));
+      if (node.type || node.opaque) card.append(textElement('small', node.opaque ? 'Opaque · read-only' : node.type));
       target.append(card);
     }
     const edges = $('workflow-edges'); edges.replaceChildren();
@@ -346,9 +350,15 @@
     show('workflow-source', workflow.source || workflow.bpl || 'Source unavailable from the Reader.');
   }
   async function loadDesigner() {
+    if (page === 'designer' && blocksDirty() && !confirm('Discard local block changes?')) {
+      $('workflow-id').value=state.loadedWorkflowId || '';
+      $('designer-process').value=state.loadedWorkflowId || '';
+      updateDesignerButtons(); updateBlockButtons(); return;
+    }
     const id = workflowId();
     if (!id) throw new Error('Enter a workflow.');
     const loadVersion = ++state.loadVersion;
+    blockState = null;
     state.workflow = null; state.loadedWorkflowId = null;
     setDisabled('save-binding', true); setDisabled('save-agent', true); setDisabled('validate-workflow', true);
     const {data, etag} = await request(workflowPath());
@@ -389,6 +399,13 @@
     setDisabled('save-binding', data.managed !== true); setDisabled('save-agent', data.managed !== true);
     setDisabled('validate-workflow', false);
     show('designer-result', data);
+    initializeBlocks(data);
+    if (data.production && $('designer-production')) {
+      $('designer-production').value=data.production;
+      const select=$('designer-process');
+      if(!Array.from(select.options).some(o=>o.value===id)) select.add(new Option(data.hostName || data.className || id,id));
+      select.value=id;
+    }
     notice('Workflow loaded from IRIS.');
   }
   function bindingPayload() {
@@ -465,6 +482,16 @@
     show('execution-mode', data.mode ? String(data.mode).toUpperCase() : 'Mode not supplied');
     $('execution-mode').dataset.mode = String(data.mode || '').toUpperCase();
     show('trace-result', data);
+    const points = $('trace-points'); points.replaceChildren();
+    const pointFilter = new URLSearchParams(location.search).get('point');
+    for (const point of data.points || []) {
+      const item = textElement('li', '', pointFilter === point.pointId ? 'selected' : '');
+      item.append(textElement('strong', point.pointId + ' · ' + point.agentId + ' @' + point.agentRevision),textElement('small',point.status + ' · ' + (point.agentSessionId || 'No AI session')));
+      const observations = document.createElement('ol'); StudioTraceView.render(observations, point.observations);
+      const details = document.createElement('details'); details.open = pointFilter === point.pointId;
+      details.append(textElement('summary','Point evidence'),textElement('pre',json(point)),observations); item.append(details); points.append(item);
+    }
+    if (!points.children.length) points.append(textElement('li','No per-point evidence captured for this historical execution.'));
     StudioTraceView.render($('trace-observations'), data.observations);
     const target = $('trace-events'); target.replaceChildren();
     for (const event of data.events || data.timeline || []) {
@@ -505,6 +532,214 @@
     show('publish-diff', 'No preview received.'); show('publish-result', 'No publication requested.');
     await loadReleases();
   }
+  let blockState = null, blockBaseline = '', blockPast = [], blockFuture = [], renderingBlocks = false;
+  let chosenAgent = null, invalidBlock = false, blockSaving = false;
+  const clone = object => JSON.parse(JSON.stringify(object));
+  const canonical = object => JSON.stringify(object, (_, value) => value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(Object.keys(value).sort().map(key=>[key,value[key]])) : value);
+  const snapshotBlocks = () => canonical(blockState && {bindings:blockState.bindings, definitions:blockState.definitions, bases:blockState.bases, attached:blockState.attached});
+  const blocksDirty = () => !!blockState && (invalidBlock || snapshotBlocks() !== blockBaseline);
+  function definitionOf(agent) {
+    return {providerRef:agent?.providerRef || '', modelName:agent?.modelName || '', prompt:agent?.prompt || '', toolSetRefs:agent?.toolSetRefs || []};
+  }
+  function initializeBlocks(data) {
+    const bindings = clone(data.bindings || (data.binding ? [data.binding] : []));
+    blockState = {bindings, definitions:{}, bases:{}, selected:bindings[0]?.bindingId, attached:data.decisionAttached !== false};
+    for (const binding of bindings) {
+      const agent = state.agents.find(a => a.agentId === binding.agentRef.id && a.revision === binding.agentRef.revision);
+      blockState.definitions[binding.bindingId] = definitionOf(agent);
+      blockState.bases[binding.bindingId] = agent?.latestRevision || binding.agentRef.revision;
+    }
+    invalidBlock = false; blockPast = []; blockFuture = []; blockBaseline = snapshotBlocks();
+    show('block-impact', data.dependencies || {complete:false,unresolved:['Unregistered BPL: dependencies not resolved.']});
+    $('review-blocks').href = root + '/publisher?workflow=' + encodeURIComponent(workflowId());
+    renderBlockInspector(); renderBlocks();
+  }
+  function saveHistory(previous) {
+    if (canonical(JSON.parse(previous)) !== canonical(blockState)) { blockPast.push(previous); if (blockPast.length > 50) blockPast.shift(); blockFuture = []; }
+  }
+  function captureBlocks() {
+    if (renderingBlocks || blockSaving || !blockState || !state.workflow?.managed || state.loadedWorkflowId !== workflowId() || !blockState.selected) return;
+    const previous = JSON.stringify(blockState);
+    try {
+      const binding = bindingPayload();
+      const index = blockState.bindings.findIndex(b => b.bindingId === blockState.selected);
+      if (index < 0) return;
+      blockState.bindings[index] = binding;
+      blockState.bases[binding.bindingId] = Number(value('agent-base-revision'));
+      blockState.definitions[binding.bindingId] = {providerRef:value('provider-ref'),modelName:value('model-name'),prompt:$('agent-prompt').value,toolSetRefs:selectedTools()};
+      invalidBlock = false; saveHistory(previous);
+    } catch (_) { invalidBlock = true; }
+    updateBlockButtons();
+  }
+  function updateBlockButtons() {
+    if (!$('block-canvas')) return;
+    const editable = !blockSaving && state.workflow?.managed === true && state.loadedWorkflowId === workflowId();
+    setDisabled('undo-blocks', !editable || !blockPast.length); setDisabled('redo-blocks', !editable || !blockFuture.length);
+    setDisabled('save-blocks', !editable || !blockState?.bindings.length || invalidBlock);
+    setDisabled('append-block', !editable || !chosenAgent || (blockState?.attached && blockState.bindings.length >= 8));
+    show('draft-state', !blockState ? 'No process loaded' : !editable ? 'Read-only' : invalidBlock ? 'Invalid local fields' : blocksDirty() ? 'Unsaved local changes' : 'Saved draft · published releases unchanged');
+  }
+  function renderBlockInspector() {
+    const binding = blockState?.bindings.find(b => b.bindingId === blockState.selected);
+    if (!binding) return;
+    renderingBlocks = true;
+    $('binding-id').value = binding.bindingId; fillMappingControls(binding);
+    fillAgent({...blockState.definitions[binding.bindingId], agentId:binding.agentRef.id,revision:binding.agentRef.revision});
+    $('agent-base-revision').value = blockState.bases[binding.bindingId] ?? binding.agentRef.revision;
+    $('agent-timeout').value = binding.timeouts?.agentMs || 30000;
+    $('binding-revision').value = state.bindingRevision;
+    const editable = state.workflow?.managed === true && state.loadedWorkflowId === workflowId() && !blockSaving;
+    document.querySelectorAll('.inspector input:not(#tool-list input),.inspector textarea,.inspector select,.inspector .remove-row').forEach(element=>element.disabled=!editable);
+    $('session-policy').disabled=true;
+    renderingBlocks = false;
+  }
+  function chooseBlock(id) {
+    if (!blockState || !blockState.bindings.some(b => b.bindingId === id)) return;
+    captureBlocks(); if (invalidBlock) throw new Error('Correct invalid fields before selecting another block.');
+    blockState.selected = id; renderBlockInspector(); renderBlocks();
+  }
+  function compatibility(agent) {
+    if (blockSaving) return 'Wait for the current save to finish.';
+    if (!state.workflow?.managed || state.loadedWorkflowId !== workflowId()) return 'This process is read-only.';
+    if (!agent || !agent.toolSetRefs?.length) return 'An agent revision with authorized READ tools is required.';
+    const allowed = new Set(state.tools.filter(t => String(t.effect || t.access).toUpperCase() === 'READ').map(t => t.className || t.id || t.name));
+    if (agent.toolSetRefs.some(t => !allowed.has(t))) return 'Agent requires unavailable or unauthorized tools.';
+    if (state.workflow.templateId === 'blood-stock-v1' && !agent.toolSetRefs.includes('Studio.Tools.BloodStockTools')) return 'Stock decisions require the ReadStock ToolSet.';
+    return '';
+  }
+  function attachAgent(agent, target) {
+    captureBlocks(); if (invalidBlock) throw new Error('Correct invalid fields before connecting a block.');
+    const reason = compatibility(agent); if (reason) throw new Error(reason);
+    const previous = JSON.stringify(blockState);
+    let binding = blockState.bindings.find(b => b.bindingId === target);
+    if (!binding) {
+      if (!blockState.attached) binding = blockState.bindings[0];
+      else {
+        if (blockState.bindings.length >= 8) throw new Error('Maximum eight decision blocks.');
+        binding = clone(blockState.bindings.at(-1));
+        binding.bindingId = state.workflow.workflowId + ':p' + crypto.randomUUID().replaceAll('-','');
+        blockState.bindings.push(binding);
+      }
+    }
+    binding.agentRef = {id:agent.agentId,revision:agent.revision};
+    blockState.definitions[binding.bindingId] = definitionOf(agent);
+    blockState.bases[binding.bindingId] = agent.latestRevision || agent.revision;
+    blockState.attached = true; blockState.selected = binding.bindingId;
+    saveHistory(previous); renderBlockInspector(); renderBlocks();
+    show('block-feedback','Connected locally. Review mappings; server validation runs when saving.');
+  }
+  function dropTarget(element, target) {
+    element.addEventListener('dragover', event => {
+      if (!compatibility(chosenAgent)) { event.preventDefault(); element.classList.add('can-connect'); event.dataTransfer.dropEffect='copy'; }
+      else show('block-feedback',compatibility(chosenAgent));
+    });
+    element.addEventListener('dragleave', () => element.classList.remove('can-connect'));
+    element.addEventListener('drop', action(event => {
+      element.classList.remove('can-connect');
+      const key = event.dataTransfer.getData('application/x-studio-agent');
+      const agent = state.agents.find(a => a.agentId + '@' + a.revision === key);
+      attachAgent(agent,target);
+    }));
+  }
+  function renderBlocks() {
+    if (!$('block-canvas')) return;
+    const catalog = $('agent-block-catalog'); catalog.replaceChildren();
+    const search = value('agent-search').toLowerCase();
+    for (const agent of state.agents.filter(a => (a.agentId+' '+a.modelName).toLowerCase().includes(search))) {
+      const item = textElement('button', agent.agentId + ' @' + agent.revision, 'agent-brick'); item.type='button';
+      const reason=compatibility(agent); item.draggable=!reason; item.title=reason || 'Drag to a compatible socket, or select then connect.';
+      item.setAttribute('aria-pressed',String(chosenAgent?.agentId===agent.agentId && chosenAgent?.revision===agent.revision));
+      item.append(textElement('small',agent.modelName));
+      item.addEventListener('click', () => { chosenAgent=agent; renderBlocks(); show('block-feedback',reason || 'Agent selected. Use Replace on a block or Connect selected agent.'); });
+      item.addEventListener('dragstart', event => { chosenAgent=agent; event.dataTransfer.setData('application/x-studio-agent',agent.agentId+'@'+agent.revision); event.dataTransfer.effectAllowed='copy'; show('block-feedback','Drop on a block to replace it, or the + socket to append.'); });
+      catalog.append(item);
+    }
+    const canvas=$('block-canvas'); canvas.replaceChildren();
+    if (blockState?.attached) for (const [index,binding] of blockState.bindings.entries()) {
+      const card=textElement('li','','decision-brick'+(blockState.selected===binding.bindingId?' selected':''));
+      card.dataset.pointId=binding.bindingId;
+      card.append(textElement('span','IN · request / context','block-port'));
+      const select=textElement('button',(index+1)+'. '+binding.agentRef.id+' @'+binding.agentRef.revision,'block-title'); select.type='button';
+      select.setAttribute('aria-pressed',String(blockState.selected===binding.bindingId));
+      select.addEventListener('click',action(() => { chooseBlock(binding.bindingId); $('tab-agent').click(); })); card.append(select);
+      const replace=textElement('button','Replace with selected agent'); replace.type='button'; replace.disabled=!!compatibility(chosenAgent);
+      replace.addEventListener('click',action(() => attachAgent(chosenAgent,binding.bindingId))); card.append(replace);
+      if (blockState.bindings.length>1) {
+        const remove=textElement('button','Remove block'); remove.type='button'; remove.disabled=!state.workflow?.managed;
+        remove.addEventListener('click',action(() => {
+          captureBlocks(); if(invalidBlock) throw new Error('Correct invalid fields first.');
+          const previous=JSON.stringify(blockState); blockState.bindings=blockState.bindings.filter(b=>b.bindingId!==binding.bindingId); delete blockState.definitions[binding.bindingId]; delete blockState.bases[binding.bindingId]; blockState.selected=blockState.bindings[0].bindingId;
+          saveHistory(previous); renderBlockInspector(); renderBlocks();
+        })); card.append(remove);
+      }
+      const routes=textElement('ul','','block-routes');
+      for(const [name,host] of Object.entries(binding.routes)) routes.append(textElement('li',name+' → '+host));
+      card.append(routes,textElement('small','Fallback: '+binding.fallback.action+' → '+binding.fallback.target),textElement('span',index<blockState.bindings.length-1?'OUT · success ↓ next block':'OUT · workflow response','block-port'));
+      dropTarget(card,binding.bindingId); canvas.append(card);
+    }
+    if(!canvas.children.length) canvas.append(textElement('li',state.workflow?.managed?'Empty decision socket':'Read-only BPL · inspect activities below','empty'));
+    updateBlockButtons();
+  }
+  async function persistAgent(id) {
+    const binding=blockState.bindings.find(b=>b.bindingId===id), definition=blockState.definitions[id];
+    const existing=state.agents.find(a=>a.agentId===binding.agentRef.id && a.revision===binding.agentRef.revision);
+    if(existing && JSON.stringify(definitionOf(existing))===JSON.stringify(definition)) return;
+    const {data}=await request('/agents/'+encodeURIComponent(binding.agentRef.id),{method:'PUT',body:{definition,baseRevision:blockState.bases[id] ?? binding.agentRef.revision}});
+    const previousBase=blockState.bases[id] ?? binding.agentRef.revision;
+    binding.agentRef.revision=data.revision; blockState.bases[id]=data.revision;
+    for(const point of blockState.bindings) if(point.agentRef.id===binding.agentRef.id && blockState.bases[point.bindingId]===previousBase) blockState.bases[point.bindingId]=data.revision;
+    for(const agent of state.agents) if(agent.agentId===binding.agentRef.id) agent.latestRevision=data.revision;
+    state.agents.push({...definition,agentId:binding.agentRef.id,revision:data.revision,latestRevision:data.revision});
+    blockPast=[]; blockFuture=[];
+    show('block-feedback','Revision '+data.revision+' saved. Its binding is still pending until Save all blocks succeeds.');
+  }
+  async function saveBlocks() {
+    captureBlocks(); if(invalidBlock || !blockState?.bindings.length || !state.workflow?.managed) throw new Error('Valid editable blocks required.');
+    await lockedBlockSave(async () => {
+      for(const binding of blockState.bindings) await persistAgent(binding.bindingId);
+      const {data}=await request(workflowPath('/bindings'),{method:'PUT',headers:{'If-Match':'"'+state.bindingRevision+'"'},body:{bindings:blockState.bindings}});
+      blockBaseline=snapshotBlocks(); blockState=null;
+      await loadDesigner(); show('designer-result',data); notice('All blocks saved. Validate and review before publication.');
+    });
+  }
+  async function lockedBlockSave(callback) {
+    if(blockSaving) throw new Error('A save is already in progress.');
+    if(state.loadedWorkflowId !== workflowId()) throw new Error('Load the selected process before saving.');
+    const controls=Array.from(document.querySelectorAll('.visual-workbench input,.visual-workbench textarea,.visual-workbench select,.visual-workbench button,.designer-navigation select,#workflow-id,#load-workflow button,.native-structure button'));
+    const disabled=controls.map(element=>element.disabled);
+    blockSaving=true; controls.forEach(element=>element.disabled=true); show('draft-state','Saving…');
+    try { return await callback(); }
+    finally {
+      blockSaving=false; controls.forEach((element,index)=>{ if(element.isConnected) element.disabled=disabled[index]; });
+      renderBlockInspector(); renderBlocks(); updateDesignerButtons();
+    }
+  }
+  async function designerNavigation() {
+    const {data}=await request('/productions');
+    for(const production of list(data)) $('designer-production').add(new Option(production.name,production.name));
+  }
+  on('designer-production','change',action(async()=>{
+    const select=$('designer-process'); select.replaceChildren(new Option('Select a process',''));
+    if(!value('designer-production')) return;
+    const {data}=await request('/workflows?production='+encodeURIComponent(value('designer-production')));
+    for(const workflow of list(data)) select.add(new Option((workflow.hostName||workflow.name||workflow.className)+' · '+(workflow.managed?'managed':'read-only'),idOf(workflow)));
+  }));
+  on('designer-process','change',action(async()=>{ if(value('designer-process')) { $('workflow-id').value=value('designer-process'); await loadDesigner(); } }));
+  on('agent-search','input',renderBlocks);
+  on('append-block','click',action(()=>attachAgent(chosenAgent,null)));
+  if($('append-block')) dropTarget($('append-block'),null);
+  on('save-blocks','click',action(saveBlocks));
+  on('inspect-block','click',action(() => {
+    if (!value('block-execution')) throw new Error('Enter the execution ID to inspect.');
+    location.href=root+'/test-trace?execution='+encodeURIComponent(value('block-execution'))+'&point='+encodeURIComponent(blockState?.selected || '');
+  }));
+  on('undo-blocks','click',()=>{ if(blockPast.length) { blockFuture.push(JSON.stringify(blockState)); blockState=JSON.parse(blockPast.pop()); invalidBlock=false; renderBlockInspector();renderBlocks(); } });
+  on('redo-blocks','click',()=>{ if(blockFuture.length) { blockPast.push(JSON.stringify(blockState)); blockState=JSON.parse(blockFuture.pop()); invalidBlock=false; renderBlockInspector();renderBlocks(); } });
+  document.querySelector('.inspector')?.addEventListener('input',captureBlocks);
+  document.querySelector('.inspector')?.addEventListener('change',captureBlocks);
+  window.addEventListener('beforeunload',event=>{ if(blocksDirty()) { event.preventDefault(); event.returnValue=''; } });
+
   document.querySelectorAll('[role="tab"]').forEach(tab => {
     function activate() {
       document.querySelectorAll('[role="tab"]').forEach(item => {
@@ -533,7 +768,8 @@
   }));
   on('load-workflow', 'submit', action(page === 'publisher' ? loadPublisher : loadDesigner));
   on('workflow-id', 'input', () => {
-    state.workflow = null; state.loadedWorkflowId = null; state.loadVersion++;
+    if(page !== 'designer') { state.workflow = null; state.loadedWorkflowId = null; }
+    state.loadVersion++;
     ['save-binding', 'save-agent', 'validate-workflow', 'preview-workflow', 'refresh-releases'].forEach(id => setDisabled(id, true));
     if (page === 'publisher') resetPublication();
     if (page === 'designer') {
@@ -543,7 +779,7 @@
     }
     if (page === 'test_trace') { $('release-id').replaceChildren(new Option('Load releases', '')); updateExecuteButton(); }
   });
-  on('agent-select', 'change', () => { if (value('agent-select') !== '') fillAgent(state.agents[Number(value('agent-select'))]); });
+  on('agent-select', 'change', () => { if (value('agent-select') !== '') { fillAgent(state.agents[Number(value('agent-select'))]); captureBlocks(); renderBlocks(); } });
   on('add-input', 'click', () => { if (state.workflow?.managed === true) { addInputRow(); changedBinding(); } });
   on('add-route', 'click', () => { if (state.workflow?.managed === true) { addRouteRow(); refreshFallback(); changedBinding(); } });
   for (const id of ['agent-id','agent-revision','agent-timeout','output-action','output-reason','fallback-action','fallback-target','input-example']) on(id, 'change', changedBinding);
@@ -559,32 +795,20 @@
   on('insert-decision', 'click', action(async () => {
     if (state.workflow?.managed !== true || state.workflow?.decisionSlotAvailable !== true) throw new Error('The template has no available insertion slot.');
     await request(workflowPath('/decision-slot'), {method:'POST', body:{expectedRevision:state.workflow.revision}});
-    await loadDesigner(); notice('AI Decision inserted in the slot recognized by IRIS.');
+    blockBaseline = ''; blockState = null; await loadDesigner(); notice('AI Decision inserted in the slot recognized by IRIS.');
   }));
   on('preview-input', 'click', action(async () => {
     const {data} = await request(workflowPath('/preview-input'), {method:'POST', body:{binding:bindingPayload(),example:parseField('input-example','{}')}});
     show('input-preview',data); show('binding-review',bindingPayload());
   }));
   on('save-agent', 'click', action(async () => {
-    const id = value('agent-id'); if (!id || state.workflow?.managed !== true) throw new Error('Open a managed workflow and enter an Agent ID.');
-    const result = await request('/agents/' + encodeURIComponent(id), {method: 'PUT', body: {
-      definition: {providerRef: value('provider-ref'), modelName: value('model-name'), prompt: $('agent-prompt').value, toolSetRefs: selectedTools()},
-      baseRevision: Number(value('agent-base-revision'))}});
-    show('designer-result', result.data);
-    if (result.data.revision) {
-      $('agent-revision').value = result.data.revision;
-      $('agent-base-revision').value = result.data.revision;
-    }
-    notice('New agent revision saved. Save the binding to reference it.');
+    captureBlocks();
+    if(invalidBlock) throw new Error('Correct invalid fields before saving.');
+    await lockedBlockSave(() => persistAgent(blockState.selected));
+    renderBlockInspector(); renderBlocks();
+    notice('Agent revision saved. Save all blocks to attach it. Published releases remain unchanged.');
   }));
-  on('save-binding', 'click', action(async () => {
-    const payload = bindingPayload();
-    const {data} = await request('/bindings/' + encodeURIComponent(payload.bindingId), {method: 'PUT', body: payload,
-      headers: {'If-Match': '"' + value('binding-revision') + '"'}});
-    show('designer-result', data);
-    await loadDesigner();
-    notice('Binding saved in IRIS. Validate the workflow before publishing.');
-  }));
+  on('save-binding', 'click', action(saveBlocks));
   on('validate-workflow', 'click', action(async () => {
     if (page === 'publisher') resetPublication();
     const {data} = await request(workflowPath('/validate'), {method: 'POST'});
@@ -640,8 +864,12 @@
   action(async () => {
     if (page === 'explorer') return explorer();
     await capabilities();
-    if (page === 'designer') { await designerCatalog(); if (workflowId()) await loadDesigner(); }
+    if (page === 'designer') { await designerCatalog(); await designerNavigation(); if (workflowId()) await loadDesigner(); }
     if (page === 'publisher' && workflowId()) await loadPublisher();
-    if (page === 'test_trace' && workflowId()) await loadReleases();
+    if (page === 'test_trace') {
+      if (workflowId()) await loadReleases();
+      const execution = new URLSearchParams(location.search).get('execution');
+      if (execution) { $('execution-id').value = execution; await loadRun(); }
+    }
   })();
 })();

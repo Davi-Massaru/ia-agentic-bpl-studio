@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "workflowId": "32c39a70e62b4ae0",
+  "loadMs": 846,
+  "checks": [
+    "native-auth",
+    "drag-replace",
+    "keyboard-append",
+    "undo-redo",
+    "prompt-edit",
+    "partial-save-retry",
+    "pinned-independent-revisions",
+    "no-auto-publication",
+    "read-only-bpl",
+    "per-point-native-simulation-trace"
+  ],
+  "providerInvoked": false,
+  "browser": "Microsoft Edge / Playwright",
+  "executionId": "4DD086A5-D592-11F1-ABF6-0242AC120002"
+}

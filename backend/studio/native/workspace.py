@@ -1,4 +1,5 @@
 """Versioned native Studio administration. Imported exclusively inside IRIS."""
+from copy import deepcopy
 import difflib
 import hashlib
 import json
@@ -125,11 +126,83 @@ def xml(binding, attached=True, request_class="Studio.Msg.WorkflowRequest"):
     return ET.tostring(root, encoding='unicode')
 
 
+def bindings_of(document):
+    """Legacy snapshots stay immutable; normalize only the read representation."""
+    return document.get('bindings', [document['binding']])
+
+
+def workflow_xml(bindings, attached=True, request_class='Studio.Msg.WorkflowRequest'):
+    if len(bindings) == 1:
+        return xml(bindings[0], attached, request_class)
+    root = ET.fromstring(xml(bindings[0], attached, request_class))
+    sequence = root.find('sequence')
+    sequence.clear()
+    parent = sequence
+    for index, binding in enumerate(bindings):
+        block = ET.fromstring(xml(binding, attached, request_class)).find('sequence')
+        call = block.find('call')
+        call.set('name', 'AI ' + binding['bindingId'].split(':')[1])
+        for assignment in call.find('request').findall('assign'):
+            if assignment.get('property') == 'callrequest.InputJson':
+                assignment.set('value', '##class(Studio.Runtime.Envelope).InputJson(request,request.ReleaseId,"' + binding['bindingId'] + '",context.Action,context.Reason)')
+        parent.extend(list(block))
+        if index < len(bindings)-1:
+            guard = ET.SubElement(parent, 'if', name='Continue after success ' + str(index+1), condition='(context.Status="SUCCESS")!(context.Status="SIMULATED")')
+            parent = ET.SubElement(guard, 'true')
+    return ET.tostring(root, encoding='unicode')
+
+
+def dependencies(workflow):
+    refs = {(b['agentRef']['id'], b['agentRef']['revision']) for b in bindings_of(workflow)}
+    consumers = []
+    for identifier in ids():
+        revision = read('latest:' + identifier)
+        draft = read('draft:' + identifier + ':' + str(revision), {})
+        for release_id in [None] + read('releases:' + identifier, []):
+            document = read('release:' + release_id, {}) if release_id else draft
+            if not document.get('binding'):
+                continue
+            for binding in bindings_of(document):
+                if (binding['agentRef']['id'], binding['agentRef']['revision']) in refs:
+                    consumers.append(dict(workflowId=identifier, production=document['production'], hostName=document.get('hostName'), bindingId=binding['bindingId'], agentRef=binding['agentRef'], releaseId=release_id, resolution='registered'))
+    for identifier in read('components', []):
+        component = read('component:' + identifier, {})
+        if (component.get('agentId'), component.get('agentRevision')) in refs:
+            consumers.append(dict(componentId=identifier, production=component['production'], hostName=component['hostName'], resolution='registered'))
+    references, unresolved = [], []
+    installed = {h['name']: h for h in workflow.get('hosts', [])}
+    for node in workflow.get('graph', {}).get('nodes', []):
+        if node.get('opaque'):
+            unresolved.append({'activityId': node['id'], 'reason': 'Opaque BPL activity; nested calls not resolved.'})
+        if node.get('kind') not in ('call', 'ai-decision'):
+            continue
+        target = node.get('target', '')
+        host = installed.get(target)
+        reference = dict(activityId=node['id'], pointId=node.get('pointId'), target=target,
+                         resolution='installed-static' if host else 'unresolved',
+                         className=host['className'] if host else None)
+        references.append(reference)
+        if not host:
+            unresolved.append({'activityId': node['id'], 'target': target, 'reason': 'Dynamic or missing target; not inferred.'})
+    unresolved.append({'reason': 'Unregistered external consumers and dynamic calls are not exhaustively resolved.'})
+    return {'consumers': consumers, 'references': references, 'complete': False, 'unresolved': unresolved,
+            'policy': 'Published consumers remain pinned. A new release installs a separate BPL host; shared Operations are not modified.'}
+
+
 def ids():
     return read('workflows', [])
 
 
-def get(identifier):
+def get(identifier, include_dependencies=True):
+    if identifier.startswith('host:'):
+        production, separator, name = identifier[5:].partition('|')
+        installed = hosts(production)
+        host = next((h for h in installed if h['name'] == name), None)
+        if not separator or not host:
+            raise Failure('WORKFLOW_NOT_FOUND', 'Business host not found in this Production.', 404)
+        result = json.loads(str(B().ReadDefinition(host['className'])._ToJSON()))
+        result.update(workflowId=identifier, production=production, hostName=name, hosts=installed)
+        return result
     if identifier.startswith('class:'):
         name = identifier[6:]
         if not any(h['className'] == name for p in productions() for h in hosts(p['name'])):
@@ -139,6 +212,8 @@ def get(identifier):
     if revision is None:
         raise Failure('WORKFLOW_NOT_FOUND', 'Workflow is not registered.', 404)
     result = read('draft:' + identifier + ':' + str(revision))
+    result['bindings'] = deepcopy(bindings_of(result))
+    result['schemaVersion'] = 2
     result['hosts'] = hosts(result['production'])
     result['managed'] = True
     if result.get('className'):
@@ -158,20 +233,30 @@ def get(identifier):
     result['graph'] = json.loads(str(B().Parse(result['source'])))
     result['graph']['recognized'] = result['managed']
     if result['managed']:
+        points = iter(result['bindings'])
         for node in result['graph']['nodes']:
             if node.get('kind') == 'call' and node.get('target') == 'AgentDecision':
-                node.update(nativeKind='call', kind='ai-decision', type='AI Decision', managedDecision=True, bindingId=result['binding']['bindingId'])
+                binding = next(points)
+                node.update(nativeKind='call', kind='ai-decision', type='AI Decision', managedDecision=True, pointId=binding['bindingId'], bindingId=binding['bindingId'])
+    if include_dependencies:
+        result['dependencies'] = dependencies(result)
     return result
 
 
 def append(workflow):
-    saved = {k: v for k, v in workflow.items() if k not in ('graph', 'hosts', 'requestFields', 'requestProperties', 'sourceHash')}
+    saved = {k: v for k, v in workflow.items() if k not in ('graph', 'hosts', 'requestFields', 'requestProperties', 'sourceHash', 'dependencies')}
     write('draft:' + workflow['workflowId'] + ':' + str(workflow['revision']), saved)
     write('latest:' + workflow['workflowId'], workflow['revision'])
     return get(workflow['workflowId'])
 
 
 def validate(workflow):
+    results = [validate_one(dict(workflow, binding=binding, pointIndex=index)) for index, binding in enumerate(bindings_of(workflow))]
+    issues = [binding['bindingId'] + ': ' + issue for binding, result in zip(bindings_of(workflow), results) for issue in result['issues']]
+    return {'valid': not issues, 'issues': issues, 'errors': issues}
+
+
+def validate_one(workflow):
     issues = []
     binding = workflow['binding']
     if not workflow['managed']:
@@ -179,9 +264,13 @@ def validate(workflow):
     if not workflow.get('decisionAttached', True):
         issues.append('Insert the managed AI Decision slot before publishing.')
     try:
-        agent(binding)
-    except Failure as ex:
-        issues.append(ex.message)
+        from studio.services.validation import validate_binding
+        validate_binding(binding)
+        definition = agent(binding)
+        if not definition.get('toolSetRefs') or any(not C().ToolAllowed(tool) for tool in definition['toolSetRefs']):
+            issues.append('Pinned agent requires installed and authorized READ ToolSets.')
+    except Exception as ex:
+        issues.append(getattr(ex, 'message', 'Invalid binding contract.'))
     if workflow.get('templateId') == 'blood-stock-v1':
         if binding.get('routes') != {'B': 'StockCenterB', 'C': 'StockCenterC', 'REVIEW': 'StockReview'} or binding.get('fallback') != {'action': 'REVIEW', 'target': 'StockReview'}:
             issues.append('Stock template requires its fixed B/C/REVIEW routes.')
@@ -208,7 +297,8 @@ def validate(workflow):
     if fallback.get('target') not in available or routes.get(fallback.get('action')) != fallback.get('target'):
         issues.append('Fallback must name an installed target and a declared action.')
     try:
-        preview = json.loads(str(iris.cls('Studio.Runtime.InputMapper').Preview(workflow['requestClass'], json.dumps(workflow['exampleRequest']), json.dumps(binding))))
+        context = {'Action': 'PREVIOUS_ACTION', 'Reason': 'Previous decision output (schema preview only)'} if workflow.get('pointIndex', 0) else {}
+        preview = json.loads(str(iris.cls('Studio.Runtime.InputMapper').Preview(workflow['requestClass'], json.dumps(workflow['exampleRequest']), json.dumps(binding), json.dumps(context))))
         if not preview.get('ok'):
             issues.append('Input mapping validation failed: ' + ', '.join(preview.get('data', {}).get('issues', [])))
     except Exception:
@@ -233,22 +323,27 @@ def handle(action, args):
         raise Failure('INVALID_ARGS', 'JSON object required.')
     if action == 'publish_component':
         return publish_component(args)
-    contracts = {'list_templates': set(), 'list_productions': set(), 'list_workflows': {'production'}, 'create_managed_workflow': {'templateId', 'production', 'name'}, 'save_binding': {'bindingId', 'payload', 'expectedRevision'}, 'get_workflow': {'workflowId'}, 'insert_decision_slot': {'workflowId', 'expectedRevision'}, 'preview_input': {'workflowId', 'binding', 'example'}, 'validate_workflow': {'workflowId'}, 'preview_publish': {'workflowId'}, 'list_releases': {'workflowId'}, 'rollback_workflow': {'workflowId', 'releaseId', 'expectedRevision'}, 'publish_workflow': {'workflowId', 'revision', 'baseHash', 'approvalRef', 'idempotencyKey'}}
+    contracts = {'save_bindings': {'workflowId', 'bindings', 'expectedRevision'}, 'list_templates': set(), 'list_productions': set(), 'list_workflows': {'production'}, 'create_managed_workflow': {'templateId', 'production', 'name'}, 'save_binding': {'bindingId', 'payload', 'expectedRevision'}, 'get_workflow': {'workflowId'}, 'insert_decision_slot': {'workflowId', 'expectedRevision'}, 'preview_input': {'workflowId', 'binding', 'example'}, 'validate_workflow': {'workflowId'}, 'preview_publish': {'workflowId'}, 'list_releases': {'workflowId'}, 'rollback_workflow': {'workflowId', 'releaseId', 'expectedRevision'}, 'publish_workflow': {'workflowId', 'revision', 'baseHash', 'approvalRef', 'idempotencyKey'}}
     if action not in contracts or set(args) - contracts[action]:
         raise Failure('INVALID_ARGS', 'Unknown administrative action or fields.')
     if action == 'list_templates':
-        return [{'templateId': 'decision-routing-v1', 'name': 'AI Decision routing', 'version': 1, 'requestClass': 'Studio.Msg.WorkflowRequest', 'description': 'One managed AI Decision with static routes and deterministic fallback.'}, {'templateId': 'blood-stock-v1', 'name': 'Blood-center stock decision', 'version': 1, 'requestClass': 'Studio.Msg.StockWorkflowRequest', 'description': 'Synthetic A request; READ stock; validated B/C/REVIEW routing.'}]
+        return [{'templateId': 'decision-routing-v1', 'name': 'AI Decision routing', 'version': 1, 'requestClass': 'Studio.Msg.WorkflowRequest', 'description': 'Managed decision blocks with static routes and deterministic fallback.'}, {'templateId': 'blood-stock-v1', 'name': 'Blood-center stock decision', 'version': 1, 'requestClass': 'Studio.Msg.StockWorkflowRequest', 'description': 'Synthetic A request; READ stock; validated B/C/REVIEW routing.'}]
     if action == 'list_productions':
         return productions()
     if action == 'list_workflows':
         production = args['production']
         installed = hosts(production)
-        managed = [get(i) for i in ids() if get(i)['production'] == production]
+        managed = []
+        for identifier in ids():
+            revision = read('latest:' + identifier)
+            summary = read('draft:' + identifier + ':' + str(revision), {})
+            if summary.get('production') == production:
+                managed.append(get(identifier, include_dependencies=False))
         classes = {w.get('className') for w in managed}
         for host in installed:
             if host['className'] not in classes and str(B().Source(host['className'])):
                 item = json.loads(str(B().ReadDefinition(host['className'])._ToJSON()))
-                item.update(production=production, hostName=host['name'])
+                item.update(workflowId='host:' + production + '|' + host['name'], production=production, hostName=host['name'])
                 managed.append(item)
         return managed
     if action == 'create_managed_workflow':
@@ -272,21 +367,40 @@ def handle(action, args):
         workflow = get(identifier)
         if not workflow['managed']:
             raise Failure('READ_ONLY_BPL', workflow.get('readOnlyReason', 'Read-only BPL.'), 409)
-        if args.get('expectedRevision') != workflow['bindingRevision']:
+        if type(args.get('expectedRevision')) is not int or args['expectedRevision'] != workflow['bindingRevision']:
             raise Failure('BINDING_REVISION_CONFLICT', 'Binding revision changed.', 409)
-        if binding.get('bindingId') != workflow['binding']['bindingId'] or set(binding) - {'bindingId', 'agentRef', 'inputs', 'outputs', 'routes', 'fallback', 'timeouts', 'runtime', 'outputSchema'}:
+        if binding.get('bindingId') not in {b['bindingId'] for b in bindings_of(workflow)} or set(binding) - {'bindingId', 'agentRef', 'inputs', 'outputs', 'routes', 'fallback', 'timeouts', 'runtime', 'outputSchema'}:
             raise Failure('INVALID_BINDING', 'Binding identity or fields are invalid.')
-        candidate = dict(workflow, binding=binding)
+        bindings = [binding if b['bindingId'] == binding['bindingId'] else b for b in bindings_of(workflow)]
+        candidate = dict(workflow, binding=bindings[0], bindings=bindings)
         result = validate(candidate)
         if not result['valid']:
             raise Failure('BINDING_INVALID', '; '.join(result['issues']))
         candidate.update(revision=workflow['revision'] + 1, bindingRevision=workflow['bindingRevision'] + 1)
         # baseHash stays the current installed XML hash until the next release.
-        candidate['source'] = xml(binding, request_class=workflow['requestClass'])
+        candidate['source'] = workflow_xml(bindings, request_class=workflow['requestClass'])
         return append(candidate)
     workflow = get(args.get('workflowId', ''))
     if action == 'get_workflow':
         return workflow
+    if action == 'save_bindings':
+        if not workflow['managed']:
+            raise Failure('READ_ONLY_BPL', 'Only recognized templates can be edited.', 409)
+        if type(args.get('expectedRevision')) is not int or args['expectedRevision'] != workflow['bindingRevision']:
+            raise Failure('BINDING_REVISION_CONFLICT', 'Binding revision changed.', 409)
+        bindings = args.get('bindings')
+        if not isinstance(bindings, list) or not 1 <= len(bindings) <= 8:
+            raise Failure('INVALID_BINDINGS', 'One to eight decision blocks required.')
+        names = [b.get('bindingId', '') for b in bindings if isinstance(b, dict)]
+        prefix = re.escape(workflow['workflowId'])
+        if len(names) != len(bindings) or len(set(names)) != len(names) or any(not re.fullmatch(prefix + r':[A-Za-z][A-Za-z0-9_]{0,63}', n) for n in names):
+            raise Failure('INVALID_POINT_ID', 'Unique workflow-scoped point identifiers required.')
+        candidate = dict(workflow, binding=bindings[0], bindings=bindings, schemaVersion=2, decisionAttached=True, decisionSlotAvailable=False)
+        validation = validate(candidate)
+        if not validation['valid']:
+            raise Failure('BINDING_INVALID', '; '.join(validation['issues'])[:900])
+        candidate.update(revision=workflow['revision']+1, bindingRevision=workflow['bindingRevision']+1, source=workflow_xml(bindings, request_class=workflow['requestClass']))
+        return append(candidate)
     if action == 'insert_decision_slot':
         if not workflow['managed']:
             raise Failure('READ_ONLY_BPL', 'Only recognized templates accept a decision slot.', 409)
@@ -297,8 +411,11 @@ def handle(action, args):
         workflow.update(decisionAttached=True, decisionSlotAvailable=False, revision=workflow['revision'] + 1, source=xml(workflow['binding'], request_class=workflow['requestClass']))
         return append(workflow)
     if action == 'preview_input':
-        result = json.loads(str(iris.cls('Studio.Runtime.InputMapper').Preview(workflow['requestClass'], json.dumps(args.get('example', {})), json.dumps(args.get('binding', workflow['binding'])))))
-        return dict(result['data'], valid=result['ok'])
+        binding = args.get('binding', workflow['binding'])
+        point = next((i for i, b in enumerate(bindings_of(workflow)) if b['bindingId'] == binding.get('bindingId')), 0)
+        context = {'Action': 'PREVIOUS_ACTION', 'Reason': 'Previous decision output (schema preview only)'} if point else {}
+        result = json.loads(str(iris.cls('Studio.Runtime.InputMapper').Preview(workflow['requestClass'], json.dumps(args.get('example', {})), json.dumps(binding), json.dumps(context))))
+        return dict(result['data'], valid=result['ok'], contextSource='schema-example' if point else 'empty-initial-context')
     if action == 'list_releases':
         return [read('release:' + i) for i in read('releases:' + workflow['workflowId'], [])]
     if not workflow['managed']:
@@ -307,14 +424,26 @@ def handle(action, args):
         return validate(workflow)
     if action == 'preview_publish':
         previous = str(B().Source(workflow['className'])) if workflow['className'] else ''
-        return {'baseHash': workflow['baseHash'], 'sourceHash': digest(workflow['source']), 'revision': workflow['revision'], 'validation': validate(workflow), 'scope': 'Native BPL class and Production host configuration', 'diff': '\n'.join(difflib.unified_diff(previous.splitlines(), workflow['source'].splitlines(), fromfile='installed BPL', tofile='draft BPL', lineterm='')), 'bindingDiff': '\n'.join(difflib.unified_diff(json.dumps(read('release:' + read('active:' + workflow['workflowId'], ''), {}).get('binding', {}), indent=2).splitlines(), json.dumps(workflow['binding'], indent=2).splitlines(), fromfile='released binding', tofile='draft binding', lineterm=''))}
+        released = read('release:' + read('active:' + workflow['workflowId'], ''), {})
+        old_bindings = bindings_of(released) if released.get('binding') else []
+        return {
+            'baseHash': workflow['baseHash'], 'sourceHash': digest(workflow['source']),
+            'revision': workflow['revision'], 'validation': validate(workflow),
+            'scope': 'Native BPL class and Production host configuration',
+            'impact': dependencies(workflow),
+            'diff': '\n'.join(difflib.unified_diff(previous.splitlines(), workflow['source'].splitlines(),
+                fromfile='installed BPL', tofile='draft BPL', lineterm='')),
+            'bindingDiff': '\n'.join(difflib.unified_diff(json.dumps(old_bindings, indent=2).splitlines(),
+                json.dumps(bindings_of(workflow), indent=2).splitlines(),
+                fromfile='released binding', tofile='draft binding', lineterm='')),
+        }
     if action == 'rollback_workflow':
         release = read('release:' + str(args.get('releaseId', '')))
         if not release or release['workflowId'] != workflow['workflowId']:
             raise Failure('RELEASE_NOT_FOUND', 'Release does not belong to workflow.', 404)
         if args.get('expectedRevision') != workflow['revision']:
             raise Failure('REVISION_CONFLICT', 'Draft revision changed.', 409)
-        workflow.update(binding=release['binding'], revision=workflow['revision'] + 1, bindingRevision=workflow['bindingRevision'] + 1, source=xml(release['binding'], request_class=workflow['requestClass']), rollbackOf=release['releaseId'])
+        workflow.update(binding=release['binding'], revision=workflow['revision'] + 1, bindingRevision=workflow['bindingRevision'] + 1, bindings=deepcopy(bindings_of(release)), schemaVersion=2, decisionAttached=True, decisionSlotAvailable=False, source=workflow_xml(bindings_of(release), request_class=workflow['requestClass']), rollbackOf=release['releaseId'])
         return append(workflow)
     if action == 'publish_workflow':
         key = args.get('idempotencyKey', '')
@@ -349,6 +478,7 @@ def handle(action, args):
         release_id = uuid.uuid4().hex
         release_host = workflow['hostName'] + 'R' + str(workflow['revision'])
         manifest = {'releaseId': release_id, 'templateId': workflow['templateId'], 'workflowId': workflow['workflowId'], 'revision': workflow['revision'], 'bindingRevision': workflow['bindingRevision'], 'sourceHash': installed_hash, 'baseHash': installed_hash, 'previousBaseHash': workflow['baseHash'], 'binding': workflow['binding'], 'agent': agent(workflow['binding']), 'compiledBPLClass': class_name, 'production': workflow['production'], 'hostName': release_host, 'serviceName': 'StudioWorkflowService', 'requestClass': workflow['requestClass'], 'compiled': True, 'published': False, 'activated': False, 'liveAIValidated': False, 'approvalRef': args['approvalRef'], 'scope': 'Native BPL compilation and Production host installation; activation requires this Production running.'}
+        manifest.update(schemaVersion=2, bindings=deepcopy(bindings_of(workflow)), agents={b['bindingId']: agent(b) for b in bindings_of(workflow)})
         # Each release has its own host, so old release IDs always run their pinned class.
         deployment = json.loads(str(W().Install(workflow['production'], release_host, class_name)))
         if not deployment['installed']:

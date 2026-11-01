@@ -191,16 +191,32 @@ Initialize required response fields before BPL suspends. Configure the Service t
 
 ### Path B — Publish a guided workflow
 
-Choose an installed template in **Workflow Explorer**, create a draft, insert **AI Decision** and configure **Inputs → Agent → Tools → Outputs → Runtime**. Validate the binding, review the diff in **Publisher**, compile/publish and execute the release in **Test & Trace**.
+Choose an installed template in **Workflow Explorer** and create a draft. In **Designer**, select the Production/process, drag an agent revision onto the `+` socket, then configure **Inputs → Agent → Tools → Outputs → Runtime** in the side Inspector. Save the blocks, validate, review the diff in **Publisher**, compile/publish and execute the release in **Test & Trace**.
 
 Templates are developer-provided starting structures with known message contracts, routes and decision points. They accelerate a supported scenario; they are not prerequisites for Path A. The managed Designer edits recognized slots and displays unrecognized BPLs as read-only in that screen.
+
+### Snap-together agent blocks
+
+![Agent blocks with catalog, compatible sockets and side Inspector](validation/screens/visual-blocks.png)
+
+- Drag a catalog revision onto an existing block to replace that point's agent, or onto `+` to append a decision. Keyboard users select the agent and activate the Connect/Replace button.
+- Click a block to edit its prompt, tools, mappings, timeout and fallback. Up to **eight independent decision blocks** are supported. Each block executes its configured route; the next runs only after success. Failure uses the fallback and stops the sequence.
+- **Undo/Redo** restores local edits. **Save all blocks** creates changed agent revisions and saves the ordered bindings; it never calls the model or publishes. A revision saved before a binding failure is retained for retry without duplication.
+- **Publisher** still validates and compares the change before publication. Published revisions remain pinned; a new release installs a separate BPL host and preserves shared Operations and older releases.
+- **Inspect selected block** opens a recorded Execution ID in Test & Trace. Per-point evidence identifies the agent revision, release, status, sessions and observations when captured. A late worker reply does not replace a workflow timeout.
+
+The visual editor supports recognized template composition, not arbitrary BPL rewrites or free routing. Unknown activities remain opaque/read-only; dynamic dependencies are explicitly unresolved. See the [implementation plan and acceptance matrix](plano.md).
+
+**Validation:** 150 Python tests, native compilation, multipoint SIMULATION, 17 legacy workspace checks, native input mapping and real Edge/Playwright interactions passed. [Native receipt](validation/visual-designer-native.json) · [Browser receipt](validation/visual-designer-browser.json). New LIVE provider validation is pending explicit authorization; earlier LIVE evidence is historical.
+
+For browser regression, install Playwright in the test virtual environment and run `python scripts/test-visual-designer.py` with Microsoft Edge, authenticated local IRIS and the synthetic Production available. It creates isolated test agents/drafts and may send an explicit SIMULATION message against the native receipt; it does not publish or call a provider. Reload WSGI workers after deploying Python/template changes.
 
 ## What each screen does
 
 | Screen | Main task | Result |
 |---|---|---|
 | **Workflow Explorer** | Discover Productions/processes; create an independent Operation or template draft | Native component or managed draft |
-| **Agentic BPL Designer** | Map inputs, version the agent, authorize tools and define outputs/fallback | Validated managed workflow binding |
+| **Agentic BPL Designer** | Assemble agent blocks, edit prompts and map inputs/tools/outputs per point | Versioned ordered bindings, ready for validation |
 | **Workflow Publisher** | Review diff, compile, publish or prepare rollback revision | Immutable managed release and native host |
 | **Test & Trace** | Execute a release in SIMULATION/LIVE; inspect saved runs by Execution ID and expand observations | Hierarchy, status, duration, tools and message/AI correlation |
 | **Settings** | Configure provider/model and save credentials | Provider access through Wallet |
@@ -245,7 +261,7 @@ Open **Settings**, select provider/model and save your credential in its dedicat
 
 ### Step 1 — Select the Production and create the workflow
 
-In **Workflow Explorer**, select `Studio.BloodDemo.Production` and **Blood-center stock decision · v1**. Click **Create managed workflow**. In Designer, click **Insert in managed slot**, then **Configure AI Decision**. The template creates a new managed BPL; the legacy example remains separately available.
+In **Workflow Explorer**, select `Studio.BloodDemo.Production` and **Blood-center stock decision · v1**. Click **Create managed workflow**. In Designer, select a stock agent and use the `+` socket, or expand **Native BPL activities and source** and use **Insert first decision**. Click the block to configure it. The template creates a new managed BPL; the legacy example remains separately available.
 
 ![Getting Started: select Production and create workflow](validation/screens/blood-explorer.jpg)
 

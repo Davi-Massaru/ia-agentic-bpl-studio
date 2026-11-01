@@ -180,7 +180,7 @@ ClassMethod MapJson(pRequest As %RegisteredObject, pBindingJson As %String, pCon
 }
 
 /// Administrative preview for a trusted workflow's request class. Every value is redacted.
-ClassMethod Preview(pRequestClass As %String, pExampleJson As %String, pBindingJson As %String) As %String
+ClassMethod Preview(pRequestClass As %String, pExampleJson As %String, pBindingJson As %String, pContextJson As %String = "{}") As %String
 {
     Set result={"ok":false,"data":{"input":{},"issues":[]}}
     Try {
@@ -201,7 +201,7 @@ ClassMethod Preview(pRequestClass As %String, pExampleJson As %String, pBindingJ
             If ((kind="integer")!(kind="number"))&&(jsonType'="number") Throw ##class(%Exception.StatusException).CreateFromStatus($$$ERROR($$$GeneralError,"PREVIEW_TYPE_MISMATCH"))
             Set $Property(request,name)=value
         }
-        Set sc=..Map(request,"{}",binding,.input,1)
+        Set sc=..Map(request,pContextJson,binding,.input,1)
         If $$$ISERR(sc) {
             Do result.data.issues.%Push("PREVIEW_INPUT_INVALID")
             Return result.%ToJSON()

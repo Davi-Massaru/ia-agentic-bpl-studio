@@ -237,7 +237,7 @@ ClassMethod Dispatch(pAction As %String, pArgsJson As %String = "{}") As %String
 {
     If '..Authorized() Return ..Error("ACCESS_DENIED","IRIS development permission in USER is required.",403)
     If $LENGTH(pArgsJson)>65536 Return ..Error("BODY_TOO_LARGE","Administrative arguments exceed limit.",413)
-    If $ListFind($ListBuild("list_templates","list_productions","list_workflows","create_managed_workflow","get_workflow","save_binding","validate_workflow","preview_publish","publish_workflow","list_releases","preview_input","insert_decision_slot","rollback_workflow"),pAction) Return ##class(Studio.Admin.Workspace).Dispatch(pAction,pArgsJson)
+    If $ListFind($ListBuild("save_bindings","list_templates","list_productions","list_workflows","create_managed_workflow","get_workflow","save_binding","validate_workflow","preview_publish","publish_workflow","list_releases","preview_input","insert_decision_slot","rollback_workflow"),pAction) Return ##class(Studio.Admin.Workspace).Dispatch(pAction,pArgsJson)
     Try {
         Set args=##class(%DynamicObject).%FromJSON(pArgsJson)
         If 'args.%IsA("%DynamicObject") Return ..Error("INVALID_ARGS","JSON object required.")
@@ -281,7 +281,17 @@ ClassMethod Handle(pAction As %String, pArgs As %DynamicObject) As %String
     }
     If pAction="list_agents" {
         Set result=[],key=""
-        For { Set key=$ORDER(^StudioControl("agent",key)) Quit:key=""  Do result.%Push(..Agent(key,^StudioControl("agent",key,"latest"))) }
+        For {
+            Set key=$Order(^StudioControl("agent",key))
+            Quit:key=""
+            Set revision=0,latest=+$Get(^StudioControl("agent",key,"latest"))
+            For {
+                Set revision=$Order(^StudioControl("agent",key,revision))
+                Quit:(revision="")!(revision="latest")
+                Set definition=..Agent(key,revision)
+                Do definition.%Set("latestRevision",latest,"number"),result.%Push(definition)
+            }
+        }
         Return ..OK(result)
     }
     If pAction="list_toolsets" {

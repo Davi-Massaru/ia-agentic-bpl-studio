@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ordered managed decision blocks — schema version 2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bindings"],
+  "properties": {
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {"$ref": "decision-binding.schema.json"}
+    }
+  }
+}

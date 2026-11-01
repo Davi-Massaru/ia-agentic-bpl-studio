@@ -5,6 +5,10 @@ Class Studio.Interop.AgentDecisionOperation Extends Ens.BusinessOperation
 Parameter INVOCATION = "Queue";
 Method HandleDecision(pRequest As Studio.Msg.DecisionRequest, Output pResponse As Studio.Msg.DecisionResponse) As %Status
 {
+    Set root=pRequest.CorrelationId
+    Set release=##class(Studio.Runtime.Releases).Manifest(pRequest.ReleaseId)
+    Set multipoint=release.%IsDefined("bindings")&&(release.bindings.%Size()>1)
+    If multipoint Set pRequest.CorrelationId=root_":"_$Piece(pRequest.BindingId,":",2)
     Set id=pRequest.CorrelationId
     Set observation=##class(Studio.Trace.Recorder).Start(id,id,"","operation",..%ConfigName)
     Set ^||StudioParentObservation=observation
@@ -14,6 +18,14 @@ Method HandleDecision(pRequest As Studio.Msg.DecisionRequest, Output pResponse A
     Set output={}
     Do output.%Set("status",pResponse.Status),output.%Set("action",pResponse.Action),output.%Set("reason","[REDACTED]"),output.%Set("errorCode",pResponse.ErrorCode)
     Set ^StudioAudit(id,"output")=output.%ToJSON(),^StudioAudit(id,"errorCode")=pResponse.ErrorCode
+    Try {
+        Set point={}
+        Do point.%Set("pointId",pRequest.BindingId),point.%Set("executionId",id),point.%Set("releaseId",pRequest.ReleaseId),point.%Set("status",pResponse.Status),point.%Set("errorCode",pResponse.ErrorCode),point.%Set("action",pResponse.Action),point.%Set("agentSessionId",pResponse.AgentSessionId)
+        Set definition=##class(Studio.Runtime.Releases).Agent(release,pRequest.BindingId)
+        Do point.%Set("agentId",definition.agentId),point.%Set("agentRevision",definition.revision)
+        Set ^StudioAudit(root,"points",pRequest.BindingId)=point.%ToJSON()
+    } Catch traceError { }
+    Set pRequest.CorrelationId=root
     Return sc
 }
 Method Evaluate(pRequest As Studio.Msg.DecisionRequest, Output pResponse As Studio.Msg.DecisionResponse) As %Status
@@ -24,9 +36,10 @@ Method Evaluate(pRequest As Studio.Msg.DecisionRequest, Output pResponse As Stud
         If pRequest.SchemaVersion'="1" Return $$$OK
         Set release=##class(Studio.Runtime.Releases).Manifest(pRequest.ReleaseId)
         If 'release.%IsDefined("binding") Return $$$OK
-        If release.binding.bindingId'=pRequest.BindingId Return $$$OK
-        Set binding=##class(Studio.Model.DecisionBinding).%New(),definition=release.agent,agent=##class(Studio.Model.AgentDefinition).%New()
-        Set binding.RoutesJson=release.binding.routes.%ToJSON(),binding.FallbackAction=release.binding.fallback.action,binding.FallbackTarget=release.binding.fallback.target
+        Set selected=##class(Studio.Runtime.Releases).Binding(release,pRequest.BindingId)
+        If 'selected.%IsDefined("bindingId") Return $$$OK
+        Set binding=##class(Studio.Model.DecisionBinding).%New(),definition=##class(Studio.Runtime.Releases).Agent(release,pRequest.BindingId),agent=##class(Studio.Model.AgentDefinition).%New()
+        Set binding.RoutesJson=selected.routes.%ToJSON(),binding.FallbackAction=selected.fallback.action,binding.FallbackTarget=selected.fallback.target
         Set pResponse.Action=binding.FallbackAction
         If '##class(Studio.Runtime.Releases).Compatible(release) {
             Set pResponse.ErrorCode="RELEASE_SOURCE_CONFLICT"

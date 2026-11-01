@@ -66,6 +66,21 @@ ClassMethod GetRunJson(pId As %String) As %String
     If '$Data(^StudioAudit(pId,"trace")) Return ##class(Studio.Admin.ControlPlane).Error("RUN_NOT_FOUND","Execution not found.",404)
     Set trace=##class(%DynamicObject).%FromJSON(^StudioAudit(pId,"trace"))
     If $Data(^StudioAudit(pId,"observations")) Do trace.%Set("observations",##class(%DynamicArray).%FromJSON(^StudioAudit(pId,"observations")))
+    Set points=[],key=""
+    For {
+        Set key=$Order(^StudioAudit(pId,"points",key))
+        Quit:key=""
+        Set point=##class(%DynamicObject).%FromJSON(^StudioAudit(pId,"points",key)),child=point.executionId
+        Do point.%Set("observations",##class(%DynamicArray).%FromJSON($Get(^StudioAudit(child,"observations"),"[]")))
+        Do point.%Set("usage",##class(%DynamicObject).%FromJSON($Get(^StudioAudit(child,"usage"),"{}")))
+        Set tools=[]
+        For j=1:1:+$Get(^StudioAudit(child,"toolCount")) {
+            If $Data(^StudioAudit(child,"tools",j)) Do tools.%Push(##class(%DynamicObject).%FromJSON(^StudioAudit(child,"tools",j)))
+        }
+        Do point.%Set("toolCalls",tools),point.%Set("workflowStatus",trace.%Get("status"))
+        Do points.%Push(point)
+    }
+    Do trace.%Set("points",points)
     Return ##class(Studio.Admin.ControlPlane).OK(trace)
 }
 }

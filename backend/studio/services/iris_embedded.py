@@ -154,6 +154,10 @@ class EmbeddedGateway:
         return self._dispatch("save_agent_revision", {"agentId": agent_id, "definition": definition,
                                                       "baseRevision": base_revision}, principal)
 
+    def save_bindings(self, workflow_id, bindings, expected_revision, *, principal):
+        return self._dispatch('save_bindings', {'workflowId': workflow_id, 'bindings': bindings,
+                                              'expectedRevision': expected_revision}, principal)
+
     def save_binding(self, binding_id, payload, expected_revision, *, principal):
         return self._dispatch("save_binding", {"bindingId": binding_id, "payload": payload,
                                                "expectedRevision": expected_revision}, principal)

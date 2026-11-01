@@ -1,5 +1,37 @@
 # Implementation status — October 28, 2026
 
+## Visual decision blocks — October 31, 2026
+
+The Designer now supports a catalog of all saved agent revisions, drag replacement,
+keyboard connection, local undo/redo and up to eight independent decision blocks.
+The existing Inspector sits beside the assembly surface. Native BPL detail is
+collapsed; unsupported activities remain opaque/read-only. Input/output ports
+describe the supported sequential composition: each block routes its decision;
+the next executes only after success. This is not an arbitrary BPL editor.
+
+Schema version 2 stores ordered `bindings` and per-point pinned `agents` in release
+snapshots while retaining the legacy `binding`/`agent` fields. Existing releases
+are not migrated or overwritten. New releases get separate native BPL hosts;
+shared Operations are unchanged. Full collection saves check the binding revision,
+authorization and native compatibility under the workspace write lock.
+
+Native build 154 in USER: compilation, two-agent SIMULATION, previous-context
+mapping, stale revisions, immutable releases, rollback drafts and a real BPL
+deadline with a late worker reply were verified. The late reply does not change
+the persisted workflow TIMEOUT. Legacy WorkspaceTest passed 17 checks and native
+InputMapperTest returned success. Edge/Playwright verified real drag gestures,
+keyboard connection, prompt history, partial-save retry without duplicate revision,
+read-only protection and per-point trace rendering. See
+`validation/visual-designer-native.json`, `validation/visual-designer-browser.json`
+and `validation/screens/visual-blocks.png`.
+
+New LIVE execution was blocked by automatic approval review because the provider
+destination/payload and possible external cost require explicit authorization.
+These new checks make no new LIVE/provider-invocation claim. Historical LIVE
+evidence in earlier sections remains historical. See `plano.md` for scope and
+remaining validation. No graph/UI framework was added; Playwright is optional
+test tooling installed only in the local virtual environment.
+
 This file records implementation and observed evidence. The architecture documents
 in `spec.md` and `SPEC/` also contain the original proposal and earlier scaffold
 inventories; those inventories are not the current implementation status.

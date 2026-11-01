@@ -9,6 +9,24 @@ ClassMethod Manifest(pReleaseId As %String) As %DynamicObject
     }
     Return ##class(Studio.Admin.ControlPlane).ReleaseManifest(pReleaseId)
 }
+ClassMethod Binding(pManifest As %DynamicObject, pId As %String = "") As %DynamicObject
+{
+    If pId="" Return pManifest.binding
+    If pManifest.%IsDefined("bindings") {
+        For i=0:1:pManifest.bindings.%Size()-1 {
+            Set binding=pManifest.bindings.%Get(i)
+            If binding.bindingId=pId Return binding
+        }
+        Return {}
+    }
+    If pManifest.binding.bindingId=pId Return pManifest.binding
+    Return {}
+}
+ClassMethod Agent(pManifest As %DynamicObject, pId As %String) As %DynamicObject
+{
+    If pManifest.%IsDefined("agents") Return pManifest.agents.%Get(pId)
+    Return pManifest.agent
+}
 ClassMethod Compatible(pManifest As %DynamicObject) As %Boolean
 {
     Try {
@@ -28,10 +46,15 @@ ClassMethod SimulationAllowed(pManifest As %DynamicObject) As %Boolean
             Set item=items.%Get(i)
             If item.className="Studio.Demo.AcknowledgeOperation",item.enabled Set targets(item.name)=1
         }
-        If '$Data(targets(pManifest.binding.fallback.target)) Return 0
-        Set iterator=pManifest.binding.routes.%GetIterator()
+        Set bindings=[]
+        If pManifest.%IsDefined("bindings") { Set bindings=pManifest.bindings } Else { Do bindings.%Push(pManifest.binding) }
+        For j=0:1:bindings.%Size()-1 {
+        Set binding=bindings.%Get(j)
+        If '$Data(targets(binding.fallback.target)) Return 0
+        Set iterator=binding.routes.%GetIterator()
         While iterator.%GetNext(.action,.target) {
             If '$Data(targets(target)) Return 0
+        }
         }
         Return 1
     } Catch ex { Return 0 }

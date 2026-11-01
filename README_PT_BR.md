@@ -1,5 +1,15 @@
 # Agentic BPL Studio
 
+**Editor de blocos:** no Designer, selecione a Production e o processo BPL. Arraste
+uma revisão do catálogo sobre um bloco para substituí-la, ou para o encaixe `+`
+para acrescentar uma decisão. Pelo teclado, selecione o agente e use o botão de
+conexão/substituição. Clique no bloco para editar prompt e mapeamentos no Inspector
+lateral. `Save all blocks` salva as revisões e vínculos; publicação continua no
+Publisher, após validação e comparação. Até oito pontos independentes são
+suportados. Cada ponto executa suas rotas; somente sucesso continua para o próximo.
+Erros usam fallback e encerram a sequência. BPL não reconhecido permanece somente
+leitura. Consulte [plano e verificação](plano.md).
+
 **Crie, configure e acompanhe agentes de IA nos seus workflows de interoperabilidade IRIS.** O Agentic BPL Studio conecta a execução de agentes pelo AI Hub nativo às Productions e aos processos BPL que sua equipe já utiliza. Defina instruções, modelos e ferramentas autorizadas, versione configurações, publique agentes como Business Operations e componha suas chamadas com atividades BPL nativas. Acompanhe a execução por mensagens IRIS e observações instrumentadas, mantendo roteamento, validação de respostas e fallback explícitos na integração.
 
 [English](README.md) · [Por que utilizar](#por-que-um-desenvolvedor-utilizaria-o-studio) · [Como usar](#do-agente-ao-workflow-em-execução) · [Instalação](#instalar-e-abrir) · [AI Hub nativo](#ai-hub-nativo-o-núcleo-de-execução-dos-agentes) · [Tecnologias](#arquitetura-e-tecnologias) · [Construção do produto](#como-o-produto-foi-construído) · [Auditoria](#auditar-agentes-observações-dentro-do-fluxo-bpl)
@@ -191,16 +201,32 @@ Inicialize os campos obrigatórios da resposta antes da suspensão do BPL. Confi
 
 ### Caminho B — Publicar um workflow guiado
 
-Escolha um template instalado em **Workflow Explorer**, crie um draft, insira **AI Decision** e configure **Inputs → Agent → Tools → Outputs → Runtime**. Valide o binding, revise o diff no **Publisher**, compile/publique e execute a release em **Test & Trace**.
+Escolha um template instalado em **Workflow Explorer** e crie um draft. No **Designer**, selecione Production/processo, arraste uma revisão do agente para o encaixe `+` e configure **Inputs → Agent → Tools → Outputs → Runtime** no Inspector lateral. Salve os blocos, valide, revise o diff no **Publisher**, compile/publique e execute a release em **Test & Trace**.
 
 Templates são estruturas iniciais fornecidas por desenvolvedores, com contratos de mensagens, rotas e pontos de decisão conhecidos. Aceleram um cenário suportado; não são pré-requisito do Caminho A. O Designer gerenciado edita pontos reconhecidos e mantém BPLs não reconhecidos somente leitura nessa tela.
+
+### Blocos de agentes encaixáveis
+
+![Catálogo, encaixes e Inspector lateral dos blocos](validation/screens/visual-blocks.png)
+
+- Arraste uma revisão para substituir o agente de um bloco, ou para `+` para acrescentar uma decisão. Pelo teclado, selecione o agente e use Connect/Replace.
+- Clique no bloco para editar prompt, ferramentas, entradas, saídas, timeout e fallback. São permitidos até **oito blocos independentes**. Cada bloco executa sua rota; somente sucesso continua para o próximo. Falha usa fallback e encerra a sequência.
+- **Undo/Redo** recupera alterações locais. **Save all blocks** cria revisões alteradas e salva os vínculos ordenados; não chama o modelo nem publica. Se a revisão persistir e o vínculo falhar, o retry reutiliza a revisão criada.
+- O **Publisher** mantém validação e comparação antes da publicação. Releases anteriores ficam fixadas; a nova release recebe seu próprio host BPL, preservando Operations compartilhadas.
+- **Inspect selected block** abre um Execution ID no Test & Trace. A evidência por ponto identifica agente, revisão, release, status, sessões e observações quando capturadas. Resposta tardia do agente não substitui timeout do workflow.
+
+O editor visual trabalha com templates reconhecidos; não reescreve BPL arbitrário. Elementos desconhecidos são opacos/somente leitura e dependências dinâmicas ficam explicitamente não resolvidas. Consulte [plano e matriz de aceite](plano.md).
+
+**Validação:** 150 testes Python, compilação nativa, SIMULATION multiponto, 17 checks do workspace legado, mapeamento nativo e interação real Edge/Playwright aprovados. [Registro nativo](validation/visual-designer-native.json) · [Registro do navegador](validation/visual-designer-browser.json). Nova validação LIVE depende de autorização explícita; os registros LIVE anteriores são históricos.
+
+Para reproduzir a UI, instale Playwright na `.venv` de testes e execute `python scripts/test-visual-designer.py`, com Microsoft Edge, IRIS local autenticado e Production sintética disponível. O script cria agentes/drafts isolados e pode enviar uma mensagem explicitamente SIMULATION usando o registro nativo; não publica nem chama o provedor. Recarregue os workers WSGI após implantar mudanças Python/templates.
 
 ## O que cada tela faz
 
 | Tela | Tarefa principal | Resultado |
 |---|---|---|
 | **Workflow Explorer** | Descobrir Productions/processos; criar Operation independente ou draft de template | Componente nativo ou draft gerenciado |
-| **Agentic BPL Designer** | Mapear entradas, versionar agente, autorizar ferramentas, definir saídas e fallback | Binding validado de workflow gerenciado |
+| **Agentic BPL Designer** | Montar blocos, editar prompts e configurar entradas/tools/saídas por ponto | Vínculos ordenados e versionados, prontos para validação |
 | **Workflow Publisher** | Revisar diff, compilar, publicar ou preparar revisão de rollback | Release gerenciada imutável e host nativo |
 | **Test & Trace** | Executar release em SIMULATION/LIVE; consultar histórico por Execution ID e expandir observações | Hierarquia, estado, duração, ferramentas e correlação com mensagens/IA |
 | **Settings** | Configurar provider/modelo e salvar credencial | Acesso ao provider via Wallet |
@@ -245,7 +271,7 @@ Abra **Settings**, selecione provider/modelo e salve sua credencial no campo ded
 
 ### Etapa 1 — Selecionar a Production e criar o workflow
 
-No **Workflow Explorer**, selecione `Studio.BloodDemo.Production` e o template **Blood-center stock decision · v1**. Clique em **Create managed workflow**. No Designer, clique em **Insert in managed slot** e depois **Configure AI Decision**. O template cria um novo BPL gerenciado; o exemplo legado permanece disponível separadamente.
+No **Workflow Explorer**, selecione `Studio.BloodDemo.Production` e o template **Blood-center stock decision · v1**. Clique em **Create managed workflow**. No Designer, selecione um agente de estoque e use o encaixe `+`, ou expanda **Native BPL activities and source** e use **Insert first decision**. Clique no bloco para configurá-lo. O template cria um novo BPL gerenciado; o exemplo legado permanece disponível separadamente.
 
 ![Getting Started: selecionar Production e criar workflow](validation/screens/blood-explorer.jpg)
 

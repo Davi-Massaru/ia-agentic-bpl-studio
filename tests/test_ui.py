@@ -74,7 +74,9 @@ def test_publisher_restores_releases_only_as_reviewable_drafts():
 def test_designer_and_test_screen_explain_native_execution_boundaries():
     client = create_app({"TESTING": True}).test_client()
     designer = client.get('/designer').get_data(as_text=True)
-    assert 'Insert in managed slot' in designer
+    assert 'Insert first decision' in designer
+    assert 'id="block-canvas"' in designer
+    assert 'id="save-blocks"' in designer
     assert 'Typed fields from the Dictionary' in designer
     assert 'Validate and preview redacted input' in designer
     assert 'Example request fields · JSON' in designer

@@ -17,7 +17,15 @@ Method OnProcessInput(pInput As Studio.Msg.WorkflowRequest, Output pOutput As St
     Set ^StudioAudit(pInput.CorrelationId,"bplHost")=manifest.hostName
     // The generated BPL timer bounds the decision wait; allow time for deterministic fallback.
     Set decisionMs=manifest.binding.timeouts.agentMs
-    If (decisionMs<100)!(decisionMs>300000) Return $$$ERROR($$$GeneralError,"DECISION_TIMEOUT_INVALID")
+    If manifest.%IsDefined("bindings") {
+        Set decisionMs=0
+        For i=0:1:manifest.bindings.%Size()-1 {
+            Set timeout=manifest.bindings.%Get(i).timeouts.agentMs
+            If (timeout<100)!(timeout>300000) Return $$$ERROR($$$GeneralError,"DECISION_TIMEOUT_INVALID")
+            Set decisionMs=decisionMs+timeout
+        }
+    }
+    If (decisionMs<100)!(decisionMs>2400000) Return $$$ERROR($$$GeneralError,"DECISION_TIMEOUT_INVALID")
     Return ..SendRequestSync(manifest.hostName,pInput,.pOutput,(decisionMs/1000)+30)
 }
 }

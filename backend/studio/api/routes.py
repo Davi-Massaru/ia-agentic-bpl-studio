@@ -134,6 +134,19 @@ def workflow(workflow_id):
     return response
 
 
+@api.put("/workflows/<workflow_id>/bindings")
+def save_bindings(workflow_id):
+    data = body(("bindings",), {"bindings"})
+    if not isinstance(data['bindings'], list) or not 1 <= len(data['bindings']) <= 8:
+        raise GatewayError('INVALID_BINDINGS', 'One to eight decision blocks required.', 422)
+    for binding in data['bindings']:
+        validate_binding(binding)
+    revision = version_header()
+    if not revision.isdecimal():
+        raise GatewayError('INVALID_REVISION', 'Integer binding revision required.', 422)
+    return jsonify(call('save_bindings', workflow_id, data['bindings'], int(revision)))
+
+
 @api.post("/workflows/<workflow_id>/decision-slot")
 def insert_decision(workflow_id):
     data = body(("expectedRevision",), {"expectedRevision"})

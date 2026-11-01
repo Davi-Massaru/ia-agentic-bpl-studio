@@ -15,4 +15,4 @@ A especificação mestre fica em [`../spec.md`](../spec.md), na raiz do projeto.
 Os contratos de API e mensagens estão em [`../contracts/`](../contracts/): `openapi.yaml` e três JSON Schemas.
 Os especialistas de engenharia estão em [`../agents/`](../agents/).
 
-**Situação:** especificações e scaffold; integração com IRIS, execução do `%AI.Agent` e compilação de BPL ainda não testadas.
+**Situação atual:** esta pasta preserva também propostas históricas. Consulte `IMPLEMENTATION_STATUS.md` e `../plano.md` para implementação e evidências atuais. O Designer inclui blocos arrastáveis, bindings multiponto e revisões independentes; compilação, mensagens SIMULATION e interação real no navegador foram verificadas. A nova validação LIVE permanece pendente de autorização do provedor.

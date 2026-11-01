@@ -1,0 +1,273 @@
+{
+  "ok": true,
+  "workflowId": "2938aa25844740bc",
+  "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+  "simulation": {
+    "events": [
+      {
+        "step": "StudioWorkflowService",
+        "status": "SUBMITTED"
+      },
+      {
+        "step": "StudioW2938aa25844740bcR2",
+        "status": "SUCCESS"
+      },
+      {
+        "step": "StockCenterB",
+        "status": "LOCAL_RECEIPT"
+      }
+    ],
+    "toolCalls": [],
+    "source": "native-IRIS-Production",
+    "executionId": "212212CA-D592-11F1-ABF6-0242AC120002",
+    "correlationId": "212212CA-D592-11F1-ABF6-0242AC120002",
+    "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+    "mode": "SIMULATION",
+    "bindingId": "2938aa25844740bc:decision",
+    "agentRevision": 1,
+    "input": {
+      "eventId": "[REDACTED]",
+      "description": "[REDACTED]"
+    },
+    "requestBodyId": "1354",
+    "bplClass": "Studio.Managed.W2938aa25844740bcR2",
+    "bplHost": "StudioW2938aa25844740bcR2",
+    "status": "SUCCESS",
+    "action": "ACCEPT",
+    "reason": "[REDACTED]",
+    "receipt": "LOCAL_ONLY:StockCenterB",
+    "agentSessionId": "",
+    "decisionExecutionId": "212212CA-D592-11F1-ABF6-0242AC120002:second",
+    "responseBodyId": "1357",
+    "messageId": "1425",
+    "interopSessionId": 1425,
+    "destination": "StockCenterB",
+    "errorCode": "",
+    "points": [
+      {
+        "pointId": "2938aa25844740bc:decision",
+        "executionId": "212212CA-D592-11F1-ABF6-0242AC120002:decision",
+        "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+        "status": "SUCCESS",
+        "errorCode": "",
+        "action": "ACCEPT",
+        "agentSessionId": "",
+        "agentId": "visual-331222962fd5",
+        "agentRevision": 1,
+        "observations": [
+          {
+            "id": "2124B2FA-D592-11F1-ABF6-0242AC120002",
+            "executionId": "212212CA-D592-11F1-ABF6-0242AC120002:decision",
+            "traceId": "212212CA-D592-11F1-ABF6-0242AC120002:decision",
+            "parentObservationId": "",
+            "type": "operation",
+            "name": "AgentDecision",
+            "status": "SUCCESS",
+            "startTime": "2026-11-01 01:18:22Z",
+            "metadata": {},
+            "endTime": "2026-11-01 01:18:22Z",
+            "durationMs": 311.572348,
+            "usage": {}
+          }
+        ],
+        "usage": {
+          "source": "SIMULATION",
+          "providerInvoked": false
+        },
+        "toolCalls": [],
+        "workflowStatus": "SUCCESS"
+      },
+      {
+        "pointId": "2938aa25844740bc:second",
+        "executionId": "212212CA-D592-11F1-ABF6-0242AC120002:second",
+        "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+        "status": "SUCCESS",
+        "errorCode": "",
+        "action": "ACCEPT",
+        "agentSessionId": "",
+        "agentId": "visual-331222962fd5",
+        "agentRevision": 2,
+        "observations": [
+          {
+            "id": "2155CF46-D592-11F1-ABF6-0242AC120002",
+            "executionId": "212212CA-D592-11F1-ABF6-0242AC120002:second",
+            "traceId": "212212CA-D592-11F1-ABF6-0242AC120002:second",
+            "parentObservationId": "",
+            "type": "operation",
+            "name": "AgentDecision",
+            "status": "SUCCESS",
+            "startTime": "2026-11-01 01:18:22Z",
+            "metadata": {},
+            "endTime": "2026-11-01 01:18:22Z",
+            "durationMs": 1.16677,
+            "usage": {}
+          }
+        ],
+        "usage": {
+          "source": "SIMULATION",
+          "providerInvoked": false
+        },
+        "toolCalls": [],
+        "workflowStatus": "SUCCESS"
+      }
+    ]
+  },
+  "fallback": {
+    "events": [
+      {
+        "step": "StudioWorkflowService",
+        "status": "SUBMITTED"
+      },
+      {
+        "step": "StudioW2938aa25844740bcR2",
+        "status": "ERROR"
+      },
+      {
+        "step": "StockReview",
+        "status": "LOCAL_RECEIPT"
+      }
+    ],
+    "toolCalls": [],
+    "source": "native-IRIS-Production",
+    "executionId": "21580B7A-D592-11F1-ABF6-0242AC120002",
+    "correlationId": "21580B7A-D592-11F1-ABF6-0242AC120002",
+    "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+    "mode": "SIMULATION",
+    "bindingId": "2938aa25844740bc:decision",
+    "agentRevision": 1,
+    "input": {
+      "eventId": "[REDACTED]",
+      "description": "[REDACTED]"
+    },
+    "requestBodyId": "1366",
+    "bplClass": "Studio.Managed.W2938aa25844740bcR2",
+    "bplHost": "StudioW2938aa25844740bcR2",
+    "status": "ERROR",
+    "action": "REVIEW",
+    "reason": "[REDACTED]",
+    "receipt": "LOCAL_ONLY:StockReview",
+    "agentSessionId": "",
+    "decisionExecutionId": "21580B7A-D592-11F1-ABF6-0242AC120002:decision",
+    "responseBodyId": "1369",
+    "messageId": "1437",
+    "interopSessionId": 1437,
+    "destination": "StockReview",
+    "errorCode": "",
+    "points": [
+      {
+        "pointId": "2938aa25844740bc:decision",
+        "executionId": "21580B7A-D592-11F1-ABF6-0242AC120002:decision",
+        "releaseId": "4e4c9abbba1b4d0a8a780c8c4696f394",
+        "status": "ERROR",
+        "errorCode": "SIMULATION_PROVIDER_DOWN",
+        "action": "REVIEW",
+        "agentSessionId": "",
+        "agentId": "visual-331222962fd5",
+        "agentRevision": 1,
+        "observations": [
+          {
+            "id": "2168D666-D592-11F1-ABF6-0242AC120002",
+            "executionId": "21580B7A-D592-11F1-ABF6-0242AC120002:decision",
+            "traceId": "21580B7A-D592-11F1-ABF6-0242AC120002:decision",
+            "parentObservationId": "",
+            "type": "operation",
+            "name": "AgentDecision",
+            "status": "ERROR",
+            "startTime": "2026-11-01 01:18:22Z",
+            "metadata": {},
+            "endTime": "2026-11-01 01:18:22Z",
+            "durationMs": 0.898525,
+            "usage": {}
+          }
+        ],
+        "usage": {},
+        "toolCalls": [],
+        "workflowStatus": "ERROR"
+      }
+    ]
+  },
+  "deadline": {
+    "events": [
+      {
+        "step": "StudioWorkflowService",
+        "status": "SUBMITTED"
+      },
+      {
+        "step": "StudioW2938aa25844740bcR6",
+        "status": "TIMEOUT"
+      },
+      {
+        "step": "StockReview",
+        "status": "LOCAL_RECEIPT"
+      }
+    ],
+    "toolCalls": [],
+    "source": "native-IRIS-Production",
+    "executionId": "2291DA7F-D592-11F1-ABF6-0242AC120002",
+    "correlationId": "2291DA7F-D592-11F1-ABF6-0242AC120002",
+    "releaseId": "deb56eca58d44d67bea36960a3df3276",
+    "mode": "SIMULATION",
+    "bindingId": "2938aa25844740bc:decision",
+    "agentRevision": 1,
+    "input": {
+      "eventId": "[REDACTED]",
+      "description": "[REDACTED]"
+    },
+    "requestBodyId": "1373",
+    "bplClass": "Studio.Managed.W2938aa25844740bcR6",
+    "bplHost": "StudioW2938aa25844740bcR6",
+    "status": "TIMEOUT",
+    "action": "REVIEW",
+    "reason": "[REDACTED]",
+    "receipt": "LOCAL_ONLY:StockReview",
+    "agentSessionId": "",
+    "decisionExecutionId": "2291DA7F-D592-11F1-ABF6-0242AC120002",
+    "responseBodyId": "1376",
+    "messageId": "1445",
+    "interopSessionId": 1445,
+    "destination": "StockReview",
+    "errorCode": "DECISION_DEADLINE_EXCEEDED",
+    "output": {
+      "status": "TIMEOUT",
+      "reason": "[REDACTED]",
+      "errorCode": "DECISION_DEADLINE_EXCEEDED",
+      "action": "REVIEW"
+    },
+    "points": [
+      {
+        "pointId": "2938aa25844740bc:decision",
+        "executionId": "2291DA7F-D592-11F1-ABF6-0242AC120002:decision",
+        "releaseId": "deb56eca58d44d67bea36960a3df3276",
+        "status": "SUCCESS",
+        "errorCode": "",
+        "action": "ACCEPT",
+        "agentSessionId": "",
+        "agentId": "visual-331222962fd5",
+        "agentRevision": 1,
+        "observations": [
+          {
+            "id": "22935F04-D592-11F1-ABF6-0242AC120002",
+            "executionId": "2291DA7F-D592-11F1-ABF6-0242AC120002:decision",
+            "traceId": "2291DA7F-D592-11F1-ABF6-0242AC120002:decision",
+            "parentObservationId": "",
+            "type": "operation",
+            "name": "AgentDecision",
+            "status": "SUCCESS",
+            "startTime": "2026-11-01 01:18:24Z",
+            "metadata": {},
+            "endTime": "2026-11-01 01:18:26Z",
+            "durationMs": 2001.468305,
+            "usage": {}
+          }
+        ],
+        "usage": {
+          "source": "SIMULATION",
+          "providerInvoked": false
+        },
+        "toolCalls": [],
+        "workflowStatus": "TIMEOUT"
+      }
+    ]
+  },
+  "live": null
+}

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Agentic BPL Studio Admin API
-  version: 1.0.0
+  version: 1.1.0
   description: |
     CONTRATO PROPOSTO DO STUDIO, NÃO API NATIVA DA INTERSYSTEMS.
     Endpoints mutantes exigem autorização, CSRF ou token válido, replay/etag
@@ -68,6 +68,43 @@ paths:
       responses:
         '200': {description: Relatório de validação}
         '409': {description: Revisão divergente}
+  /workflows/{workflowId}/bindings:
+    put:
+      summary: Salvar atomicamente os blocos ordenados de um rascunho gerenciado
+      description: |
+        Schema de workflow 2. Um a oito bindings com IDs estáveis prefixados pelo
+        workflowId e dois-pontos. Preserva revisões publicadas e hosts existentes.
+        O próximo bloco executa somente após sucesso; erro usa fallback e encerra
+        a sequência. Não publica, ativa ou chama o provedor.
+      operationId: saveBindings
+      parameters:
+        - $ref: '#/components/parameters/WorkflowId'
+        - in: header
+          name: If-Match
+          required: true
+          schema: {type: string}
+          description: Revisão inteira dos bindings entre aspas, por exemplo '"3"'.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [bindings]
+              properties:
+                bindings:
+                  type: array
+                  minItems: 1
+                  maxItems: 8
+                  items:
+                    $ref: './schemas/decision-binding.schema.json'
+      responses:
+        '200': {description: Rascunho schemaVersion 2 com bindings, binding legado, bindingRevision e revisão atualizados}
+        '403': {description: Sem privilégio ou CSRF inválido}
+        '409': {description: Revisão divergente ou BPL somente leitura}
+        '422': {description: Identidade, contrato ou dependência incompatível}
+        '428': {description: If-Match ausente}
   /workflows/{workflowId}/preview:
     post:
       summary: Exibir diff e plano de publicação

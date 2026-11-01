@@ -4,6 +4,8 @@
 > Build 154, authenticated WSGI, BPL releases, simulation and two LIVE decisions with READ tools validated.
 > Original proposal inventories follow; see the implementation status above for current evidence.
 
+> Evolução visual (31/10/2026): o Designer agora compõe até oito blocos de decisão gerenciados, com arrastar e soltar, Inspector lateral, revisões independentes e publicação versionada. As restrições de slot único abaixo são históricas; consulte `plano.md` e `contracts/openapi.yaml`. Operations independentes continuam disponíveis no editor BPL nativo. Testes novos LIVE ainda não executados por bloqueio de autorização.
+
 **DOCUMENTO:** ABS-SPEC-001  
 **EDIÇÃO:** MVP 1.0 — 25/10/2026  
 **STATUS:** Reference specification; current implementation and validation: `SPEC/IMPLEMENTATION_STATUS.md`.
