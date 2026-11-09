@@ -1,0 +1,3 @@
+Edited with the built-in image_gen tool.
+
+Edit the supplied application icon. Preserve its square 1:1 proportions, navy background, cyan/teal/blue colors, central aperture hexagon, connected workflow symbols and polished dimensional style. Add a clearly readable caption centered at the bottom BELOW all the workflow nodes, inside the rounded navy tile. Exact caption verbatim: "U.I build Agente flows". Use clean modern semibold sans-serif lettering in pale cyan/white, one line, ample spacing, no quotation marks. Slightly reduce and shift the existing full symbol group upward only as needed to create a comfortable caption area; preserve all nodes and connections without overlapping text. The caption must be legible and professionally integrated. No other text or changes.

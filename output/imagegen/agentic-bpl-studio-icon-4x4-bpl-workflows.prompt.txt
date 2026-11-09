@@ -1,0 +1,3 @@
+Edited with the built-in image_gen tool.
+
+Edit this application icon by replacing ONLY its bottom caption "U.I build Agente flows" with the exact text "Build AI agents into BPL workflows". Set the new caption centered in two balanced lines: first line "Build AI agents", second line "into BPL workflows". Clean modern semibold sans-serif, pale cyan-white, clearly legible, comfortable spacing and margins within the existing bottom caption area. Preserve all other artwork, connected symbols, aperture hub, positions, rounded tile, colors, lighting, square proportions and background unchanged. No additional text.
